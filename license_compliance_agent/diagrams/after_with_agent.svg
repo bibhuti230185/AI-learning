@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="480" fill="#f0fdf4" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#166534" font-size="20" font-weight="bold">✅ AFTER — With LicenseLens AI</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="60" width="160" height="90" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="120" y="85" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">1. Add Dependency</text>
+  <text x="120" y="105" text-anchor="middle" fill="#065f46" font-size="10">npm install pkg</text>
+  <text x="120" y="120" text-anchor="middle" fill="#059669" font-size="10" font-weight="bold">Agent detects! 👁️</text>
+  <text x="120" y="140" text-anchor="middle" fill="#059669" font-size="9">⏱️ Instant</text>
+
+  <!-- Arrow -->
+  <polygon points="210,100 230,90 230,95 270,95 270,105 230,105 230,110" fill="#059669"/>
+
+  <!-- Step 2 -->
+  <rect x="250" y="60" width="160" height="90" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="330" y="85" text-anchor="middle" fill="#5b21b6" font-size="12" font-weight="bold">2. License Lookup</text>
+  <text x="330" y="105" text-anchor="middle" fill="#5b21b6" font-size="10">Query SW360/FOSSology</text>
+  <text x="330" y="120" text-anchor="middle" fill="#7c3aed" font-size="10" font-weight="bold">GPL-3.0 detected 🔍</text>
+  <text x="330" y="140" text-anchor="middle" fill="#7c3aed" font-size="9">⏱️ &lt;1 second</text>
+
+  <!-- Arrow -->
+  <polygon points="420,100 440,90 440,95 480,95 480,105 440,105 440,110" fill="#7c3aed"/>
+
+  <!-- Step 3 -->
+  <rect x="460" y="60" width="160" height="90" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="540" y="85" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">3. AI Classification</text>
+  <text x="540" y="105" text-anchor="middle" fill="#991b1b" font-size="10">Map to obligations</text>
+  <text x="540" y="120" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">🔴🟡🔵 Categorized</text>
+  <text x="540" y="140" text-anchor="middle" fill="#dc2626" font-size="9">⏱️ 1-2 seconds</text>
+
+  <!-- Arrow -->
+  <polygon points="630,100 650,90 650,95 690,95 690,105 650,105 650,110" fill="#dc2626"/>
+
+  <!-- Step 4 -->
+  <rect x="670" y="60" width="190" height="90" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+  <text x="765" y="85" text-anchor="middle" fill="#9a3412" font-size="12" font-weight="bold">4. Checklist Generated</text>
+  <text x="765" y="105" text-anchor="middle" fill="#9a3412" font-size="10">COMPLIANCE_CHECKLIST.md</text>
+  <text x="765" y="120" text-anchor="middle" fill="#ea580c" font-size="10" font-weight="bold">Shown in VS Code 📝</text>
+  <text x="765" y="140" text-anchor="middle" fill="#ea580c" font-size="9">⏱️ Instant</text>
+
+  <!-- Row 2 -->
+  <!-- Step 5 -->
+  <rect x="120" y="180" width="200" height="90" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="220" y="205" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">5. Developer Resolves</text>
+  <text x="220" y="225" text-anchor="middle" fill="#065f46" font-size="10">Checks off 🔴 items</text>
+  <text x="220" y="240" text-anchor="middle" fill="#059669" font-size="10" font-weight="bold">Documents 🟡 decisions</text>
+  <text x="220" y="260" text-anchor="middle" fill="#059669" font-size="9">While context is fresh! ✅</text>
+
+  <!-- Arrow -->
+  <polygon points="330,220 350,210 350,215 400,215 400,225 350,225 350,230" fill="#059669"/>
+
+  <!-- Step 6 -->
+  <rect x="380" y="180" width="200" height="90" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <text x="480" y="205" text-anchor="middle" fill="#075985" font-size="12" font-weight="bold">6. Commit Allowed</text>
+  <text x="480" y="225" text-anchor="middle" fill="#075985" font-size="10">All 🔴 items resolved</text>
+  <text x="480" y="240" text-anchor="middle" fill="#0284c7" font-size="10" font-weight="bold">Hook passes 🚦</text>
+  <text x="480" y="260" text-anchor="middle" fill="#0284c7" font-size="9">git commit succeeds</text>
+
+  <!-- Arrow -->
+  <polygon points="590,220 610,210 610,215 660,215 660,225 610,225 610,230" fill="#0284c7"/>
+
+  <!-- Step 7 -->
+  <rect x="640" y="180" width="200" height="90" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="740" y="205" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">7. Release Confident</text>
+  <text x="740" y="225" text-anchor="middle" fill="#065f46" font-size="10">Compliance guaranteed</text>
+  <text x="740" y="240" text-anchor="middle" fill="#059669" font-size="10" font-weight="bold">No late surprises 🎉</text>
+  <text x="740" y="260" text-anchor="middle" fill="#059669" font-size="9">Ship on time</text>
+
+  <!-- Result box -->
+  <rect x="60" y="300" width="780" height="80" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="450" y="325" text-anchor="middle" fill="#166534" font-size="16" font-weight="bold">Result: Instant Detection, AI Classification, Enforced Gates</text>
+  
+  <text x="200" y="355" text-anchor="middle" fill="#065f46" font-size="12">⚡ Seconds to feedback</text>
+  <text x="200" y="370" text-anchor="middle" fill="#065f46" font-size="11">Fix while context is fresh</text>
+
+  <text x="450" y="355" text-anchor="middle" fill="#065f46" font-size="12">📋 Structured checklist</text>
+  <text x="450" y="370" text-anchor="middle" fill="#065f46" font-size="11">Version-controlled .md file</text>
+
+  <text x="700" y="355" text-anchor="middle" fill="#065f46" font-size="12">🚦 Commit/build gates</text>
+  <text x="700" y="370" text-anchor="middle" fill="#065f46" font-size="11">Non-compliant code blocked</text>
+
+  <!-- Bottom stats -->
+  <rect x="60" y="400" width="250" height="70" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="185" y="425" text-anchor="middle" fill="#166534" font-size="14" font-weight="bold">0-1 Rework Cycles</text>
+  <text x="185" y="445" text-anchor="middle" fill="#065f46" font-size="11">Fix in-flow, same day</text>
+  <text x="185" y="460" text-anchor="middle" fill="#065f46" font-size="11">Context never lost</text>
+
+  <rect x="325" y="400" width="250" height="70" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="450" y="425" text-anchor="middle" fill="#166534" font-size="14" font-weight="bold">Version-Controlled</text>
+  <text x="450" y="445" text-anchor="middle" fill="#065f46" font-size="11">COMPLIANCE_CHECKLIST.md</text>
+  <text x="450" y="460" text-anchor="middle" fill="#065f46" font-size="11">Always current, auditable</text>
+
+  <rect x="590" y="400" width="250" height="70" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="715" y="425" text-anchor="middle" fill="#166534" font-size="14" font-weight="bold">Pre-Classified Tiers</text>
+  <text x="715" y="445" text-anchor="middle" fill="#065f46" font-size="11">🔴🟡🔵 reduces legal noise</text>
+  <text x="715" y="460" text-anchor="middle" fill="#065f46" font-size="11">Faster decisions</text>
+</svg>

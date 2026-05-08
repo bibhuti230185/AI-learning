@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Arial, sans-serif">
+  <rect width="800" height="450" fill="#f8fafc" rx="12"/>
+  <text x="400" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e293b">What Each Layer Does — Block View</text>
+
+  <!-- Layer 1 block -->
+  <rect x="30" y="55" width="740" height="150" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="400" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="#991b1b">⚡ Layer 1 — Deterministic Linter (no LLM, &lt;10 seconds, $0)</text>
+
+  <rect x="50" y="95" width="165" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="132" y="114" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R01: License Header</text>
+  <text x="132" y="130" text-anchor="middle" font-size="9" fill="#666">grep SPDX in first 15 lines</text>
+
+  <rect x="225" y="95" width="165" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="307" y="114" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R02: No System.out</text>
+  <text x="307" y="130" text-anchor="middle" font-size="9" fill="#666">grep in added lines</text>
+
+  <rect x="400" y="95" width="175" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="487" y="114" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R03: No printStackTrace</text>
+  <text x="487" y="130" text-anchor="middle" font-size="9" fill="#666">grep in added lines</text>
+
+  <rect x="585" y="95" width="175" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="672" y="114" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R04: No field @Autowired</text>
+  <text x="672" y="130" text-anchor="middle" font-size="9" fill="#666">regex pattern match</text>
+
+  <rect x="50" y="150" width="165" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="132" y="169" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R05: @PreAuthorize</text>
+  <text x="132" y="185" text-anchor="middle" font-size="9" fill="#666">on POST/PUT/PATCH/DELETE</text>
+
+  <rect x="225" y="150" width="165" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="307" y="169" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R06: @Operation</text>
+  <text x="307" y="185" text-anchor="middle" font-size="9" fill="#666">on all @*Mapping methods</text>
+
+  <rect x="400" y="150" width="175" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="487" y="169" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R07: Log4j2 Logger</text>
+  <text x="487" y="185" text-anchor="middle" font-size="9" fill="#666">not SLF4J</text>
+
+  <rect x="585" y="150" width="175" height="45" rx="6" fill="#fff" stroke="#fca5a5"/>
+  <text x="672" y="169" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">R08: Signed-off-by</text>
+  <text x="672" y="185" text-anchor="middle" font-size="9" fill="#666">in commit messages</text>
+
+  <!-- Layer 2 block -->
+  <rect x="30" y="225" width="740" height="140" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-size="14" font-weight="bold" fill="#065f46">🧠 Layer 2 — RAG-Powered Deep Review (LLM, 30-60 seconds, ~$0.05)</text>
+
+  <rect x="50" y="265" width="220" height="45" rx="6" fill="#fff" stroke="#86efac"/>
+  <text x="160" y="284" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">L01: Test exercises HTTP?</text>
+  <text x="160" y="300" text-anchor="middle" font-size="9" fill="#666">Check test count vs endpoint count</text>
+
+  <rect x="280" y="265" width="230" height="45" rx="6" fill="#fff" stroke="#86efac"/>
+  <text x="395" y="284" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">L02: Thrift null-safety?</text>
+  <text x="395" y="300" text-anchor="middle" font-size="9" fill="#666">Retrieve method sig, check null guard</text>
+
+  <rect x="520" y="265" width="240" height="45" rx="6" fill="#fff" stroke="#86efac"/>
+  <text x="640" y="284" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">L03: Jackson mixin needed?</text>
+  <text x="640" y="300" text-anchor="middle" font-size="9" fill="#666">Check if new fields exposed</text>
+
+  <rect x="50" y="320" width="220" height="45" rx="6" fill="#fff" stroke="#86efac"/>
+  <text x="160" y="339" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">L04: Exception pattern?</text>
+  <text x="160" y="355" text-anchor="middle" font-size="9" fill="#666">Compare against rules</text>
+
+  <rect x="280" y="320" width="230" height="45" rx="6" fill="#fff" stroke="#86efac"/>
+  <text x="395" y="339" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">L05: Cross-file consistency?</text>
+  <text x="395" y="355" text-anchor="middle" font-size="9" fill="#666">Controller → Service → Test exist?</text>
+
+  <rect x="520" y="320" width="240" height="45" rx="6" fill="#fff" stroke="#86efac"/>
+  <text x="640" y="339" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">L06: Pattern deviation?</text>
+  <text x="640" y="355" text-anchor="middle" font-size="9" fill="#666">Compare with same entity's endpoints</text>
+
+  <!-- Output -->
+  <rect x="200" y="390" width="400" height="40" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="400" y="415" text-anchor="middle" font-size="12" font-weight="bold" fill="#9a3412">📝 Merged findings → inline comments with fix suggestions</text>
+</svg>
+

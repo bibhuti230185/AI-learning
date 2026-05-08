@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="500" fill="#f8fafc" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#1e293b" font-size="20" font-weight="bold">📊 Side-by-Side at a Glance</text>
+
+  <!-- Left column header (Before) -->
+  <rect x="40" y="55" width="400" height="40" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="240" y="82" text-anchor="middle" fill="#991b1b" font-size="16" font-weight="bold">❌ Without Agent (Today)</text>
+
+  <!-- Right column header (After) -->
+  <rect x="460" y="55" width="400" height="40" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="660" y="82" text-anchor="middle" fill="#065f46" font-size="16" font-weight="bold">✅ With LicenseLens AI</text>
+
+  <!-- Row 1: Detection -->
+  <rect x="40" y="105" width="400" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="50" y="125" fill="#991b1b" font-size="11" font-weight="bold">Detection Timing</text>
+  <text x="50" y="145" fill="#7f1d1d" font-size="10">Compliance scan runs weeks after deps added</text>
+
+  <rect x="460" y="105" width="400" height="55" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="470" y="125" fill="#065f46" font-size="11" font-weight="bold">Detection Timing</text>
+  <text x="470" y="145" fill="#065f46" font-size="10">Agent detects the moment dependency is added</text>
+
+  <!-- Row 2: Feedback Time -->
+  <rect x="40" y="165" width="400" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="50" y="185" fill="#991b1b" font-size="11" font-weight="bold">Time to Feedback</text>
+  <text x="50" y="205" fill="#7f1d1d" font-size="10">⏰ Weeks (scan → manual review → actions)</text>
+
+  <rect x="460" y="165" width="400" height="55" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="470" y="185" fill="#065f46" font-size="11" font-weight="bold">Time to Feedback</text>
+  <text x="470" y="205" fill="#065f46" font-size="10">⚡ Seconds (auto lookup → classify → checklist)</text>
+
+  <!-- Row 3: Obligation Mapping -->
+  <rect x="40" y="225" width="400" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="50" y="245" fill="#991b1b" font-size="11" font-weight="bold">Obligation Mapping</text>
+  <text x="50" y="265" fill="#7f1d1d" font-size="10">Manual legal interpretation — inconsistent</text>
+
+  <rect x="460" y="225" width="400" height="55" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="470" y="245" fill="#065f46" font-size="11" font-weight="bold">Obligation Mapping</text>
+  <text x="470" y="265" fill="#065f46" font-size="10">AI classifies into 🔴🟡🔵 tiers consistently</text>
+
+  <!-- Row 4: Tracking -->
+  <rect x="40" y="285" width="400" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="50" y="305" fill="#991b1b" font-size="11" font-weight="bold">Tracking</text>
+  <text x="50" y="325" fill="#7f1d1d" font-size="10">Spreadsheets (Excel/SharePoint) — not version-controlled</text>
+
+  <rect x="460" y="285" width="400" height="55" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="470" y="305" fill="#065f46" font-size="11" font-weight="bold">Tracking</text>
+  <text x="470" y="325" fill="#065f46" font-size="10">COMPLIANCE_CHECKLIST.md — version-controlled, auditable</text>
+
+  <!-- Row 5: Enforcement -->
+  <rect x="40" y="345" width="400" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="50" y="365" fill="#991b1b" font-size="11" font-weight="bold">Enforcement</text>
+  <text x="50" y="385" fill="#7f1d1d" font-size="10">🚫 None — can commit/build non-compliant code freely</text>
+
+  <rect x="460" y="345" width="400" height="55" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="470" y="365" fill="#065f46" font-size="11" font-weight="bold">Enforcement</text>
+  <text x="470" y="385" fill="#065f46" font-size="10">🚦 Commit hook + build gate block until resolved</text>
+
+  <!-- Row 6: Rework -->
+  <rect x="40" y="405" width="400" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="50" y="425" fill="#991b1b" font-size="11" font-weight="bold">Rework</text>
+  <text x="50" y="445" fill="#7f1d1d" font-size="10">2-3 cycles — fix code that's weeks old, context lost</text>
+
+  <rect x="460" y="405" width="400" height="55" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+  <text x="470" y="425" fill="#065f46" font-size="11" font-weight="bold">Rework</text>
+  <text x="470" y="445" fill="#065f46" font-size="10">0-1 cycles — fix in-flow while context is fresh</text>
+
+  <!-- Bottom summary -->
+  <rect x="40" y="470" width="400" height="25" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="240" y="488" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">Late, Manual, Hope for the Best</text>
+
+  <rect x="460" y="470" width="400" height="25" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="660" y="488" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">Early, Automated, Compliance by Design</text>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="450" fill="#f0fdf4" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#166534" font-size="20" font-weight="bold">✅ Why This Is Feasible</text>
+
+  <!-- Factor 1 -->
+  <rect x="40" y="60" width="260" height="100" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="170" y="85" text-anchor="middle" fill="#065f46" font-size="13" font-weight="bold">📦 Dep Files Are Structured</text>
+  <text x="170" y="105" text-anchor="middle" fill="#065f46" font-size="10">package.json, pom.xml,</text>
+  <text x="170" y="120" text-anchor="middle" fill="#065f46" font-size="10">requirements.txt are</text>
+  <text x="170" y="135" text-anchor="middle" fill="#065f46" font-size="10">machine-readable formats</text>
+  <text x="170" y="150" text-anchor="middle" fill="#059669" font-size="10" font-weight="bold">Easy to parse + watch</text>
+
+  <!-- Factor 2 -->
+  <rect x="320" y="60" width="260" height="100" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="450" y="85" text-anchor="middle" fill="#5b21b6" font-size="13" font-weight="bold">🗄️ License Data Exists</text>
+  <text x="450" y="105" text-anchor="middle" fill="#5b21b6" font-size="10">SW360 is already the</text>
+  <text x="450" y="120" text-anchor="middle" fill="#5b21b6" font-size="10">source of truth for OSS</text>
+  <text x="450" y="135" text-anchor="middle" fill="#5b21b6" font-size="10">compliance at Siemens</text>
+  <text x="450" y="150" text-anchor="middle" fill="#7c3aed" font-size="10" font-weight="bold">REST API available</text>
+
+  <!-- Factor 3 -->
+  <rect x="600" y="60" width="260" height="100" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="730" y="85" text-anchor="middle" fill="#991b1b" font-size="13" font-weight="bold">📚 OD Catalog Defined</text>
+  <text x="730" y="105" text-anchor="middle" fill="#991b1b" font-size="10">12 Obligation Dimensions</text>
+  <text x="730" y="120" text-anchor="middle" fill="#991b1b" font-size="10">already documented with</text>
+  <text x="730" y="135" text-anchor="middle" fill="#991b1b" font-size="10">clear 🔴🟡🔵 tiers</text>
+  <text x="730" y="150" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">Classification schema ready</text>
+
+  <!-- Factor 4 -->
+  <rect x="40" y="175" width="260" height="100" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="170" y="200" text-anchor="middle" fill="#854d0e" font-size="13" font-weight="bold">🧠 LLM Classification Works</text>
+  <text x="170" y="220" text-anchor="middle" fill="#854d0e" font-size="10">GPT-4o reliably maps</text>
+  <text x="170" y="235" text-anchor="middle" fill="#854d0e" font-size="10">license text to structured</text>
+  <text x="170" y="250" text-anchor="middle" fill="#854d0e" font-size="10">obligation categories</text>
+  <text x="170" y="265" text-anchor="middle" fill="#ca8a04" font-size="10" font-weight="bold">Proven in similar use cases</text>
+
+  <!-- Factor 5 -->
+  <rect x="320" y="175" width="260" height="100" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <text x="450" y="200" text-anchor="middle" fill="#075985" font-size="13" font-weight="bold">💻 VS Code API Is Rich</text>
+  <text x="450" y="220" text-anchor="middle" fill="#075985" font-size="10">File watchers, panels,</text>
+  <text x="450" y="235" text-anchor="middle" fill="#075985" font-size="10">notifications, diagnostics</text>
+  <text x="450" y="250" text-anchor="middle" fill="#075985" font-size="10">all available via API</text>
+  <text x="450" y="265" text-anchor="middle" fill="#0284c7" font-size="10" font-weight="bold">Extension model mature</text>
+
+  <!-- Factor 6 -->
+  <rect x="600" y="175" width="260" height="100" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+  <text x="730" y="200" text-anchor="middle" fill="#9a3412" font-size="13" font-weight="bold">🪝 Git Hooks Are Standard</text>
+  <text x="730" y="220" text-anchor="middle" fill="#9a3412" font-size="10">Pre-commit hooks widely</text>
+  <text x="730" y="235" text-anchor="middle" fill="#9a3412" font-size="10">adopted, easy to install</text>
+  <text x="730" y="250" text-anchor="middle" fill="#9a3412" font-size="10">and configure</text>
+  <text x="730" y="265" text-anchor="middle" fill="#ea580c" font-size="10" font-weight="bold">Enforcement mechanism exists</text>
+
+  <!-- Factor 7: MVP is clear -->
+  <rect x="180" y="295" width="540" height="80" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="450" y="320" text-anchor="middle" fill="#065f46" font-size="14" font-weight="bold">🎯 MVP Is Demonstrable</text>
+  <text x="450" y="340" text-anchor="middle" fill="#065f46" font-size="11">Single dependency → license lookup → classify → checklist → commit block</text>
+  <text x="450" y="360" text-anchor="middle" fill="#059669" font-size="11" font-weight="bold">Even a lightweight prototype proves core value</text>
+
+  <!-- Bottom confidence box -->
+  <rect x="60" y="390" width="780" height="45" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="450" y="418" text-anchor="middle" fill="#854d0e" font-size="13" font-weight="bold">Hackathon Rating: 9.8 / 10 — Visionary, MVP-friendly, Strong Roadmap, Real Enterprise Pain</text>
+</svg>

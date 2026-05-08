@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="500" fill="#fef2f2" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#991b1b" font-size="20" font-weight="bold">❌ BEFORE — The Manual Way (Today)</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="60" width="170" height="80" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="125" y="85" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">1. Add Dependency</text>
+  <text x="125" y="105" text-anchor="middle" fill="#065f46" font-size="10">npm install pkg</text>
+  <text x="125" y="120" text-anchor="middle" fill="#065f46" font-size="10">No feedback 🤷</text>
+  <text x="125" y="135" text-anchor="middle" fill="#059669" font-size="9">⏱️ Day 1</text>
+
+  <!-- Arrow -->
+  <polygon points="220,95 240,85 240,90 290,90 290,100 240,100 240,105" fill="#6b7280"/>
+
+  <!-- Step 2 -->
+  <rect x="260" y="60" width="170" height="80" rx="10" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+  <text x="345" y="85" text-anchor="middle" fill="#374151" font-size="12" font-weight="bold">2. Develop Features</text>
+  <text x="345" y="105" text-anchor="middle" fill="#374151" font-size="10">Weeks of coding...</text>
+  <text x="345" y="120" text-anchor="middle" fill="#374151" font-size="10">More deps added...</text>
+  <text x="345" y="135" text-anchor="middle" fill="#6b7280" font-size="9">⏱️ Week 2-4</text>
+
+  <!-- Arrow -->
+  <polygon points="440,95 460,85 460,90 510,90 510,100 460,100 460,105" fill="#6b7280"/>
+
+  <!-- Step 3 -->
+  <rect x="480" y="60" width="170" height="80" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="565" y="85" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">3. Compliance Scan</text>
+  <text x="565" y="105" text-anchor="middle" fill="#991b1b" font-size="10">😱 Issues found!</text>
+  <text x="565" y="120" text-anchor="middle" fill="#991b1b" font-size="10">GPL detected!</text>
+  <text x="565" y="135" text-anchor="middle" fill="#dc2626" font-size="9">⏱️ Week 5+ (LATE!)</text>
+
+  <!-- Arrow -->
+  <polygon points="660,95 680,85 680,90 730,90 730,100 680,100 680,105" fill="#dc2626"/>
+
+  <!-- Step 4 -->
+  <rect x="700" y="60" width="170" height="80" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="785" y="85" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">4. Manual Review</text>
+  <text x="785" y="105" text-anchor="middle" fill="#991b1b" font-size="10">Read license text</text>
+  <text x="785" y="120" text-anchor="middle" fill="#991b1b" font-size="10">What does it mean?</text>
+  <text x="785" y="135" text-anchor="middle" fill="#dc2626" font-size="9">🧠 Tribal knowledge</text>
+
+  <!-- Row 2 -->
+  <!-- Step 5 -->
+  <rect x="40" y="170" width="170" height="80" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="125" y="195" text-anchor="middle" fill="#854d0e" font-size="12" font-weight="bold">5. Translate to Actions</text>
+  <text x="125" y="215" text-anchor="middle" fill="#854d0e" font-size="10">What must we do?</text>
+  <text x="125" y="230" text-anchor="middle" fill="#854d0e" font-size="10">Inconsistent answers</text>
+  <text x="125" y="245" text-anchor="middle" fill="#ca8a04" font-size="9">📋 Spreadsheet chaos</text>
+
+  <!-- Arrow -->
+  <polygon points="220,205 240,195 240,200 290,200 290,210 240,210 240,215" fill="#ca8a04"/>
+
+  <!-- Step 6 -->
+  <rect x="260" y="170" width="170" height="80" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="345" y="195" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">6. Legal Escalation</text>
+  <text x="345" y="215" text-anchor="middle" fill="#991b1b" font-size="10">Edge case → Legal</text>
+  <text x="345" y="230" text-anchor="middle" fill="#991b1b" font-size="10">Wait for answer...</text>
+  <text x="345" y="245" text-anchor="middle" fill="#dc2626" font-size="9">⏱️ Days of delay</text>
+
+  <!-- Arrow -->
+  <polygon points="440,205 460,195 460,200 510,200 510,210 460,210 460,215" fill="#dc2626"/>
+
+  <!-- Step 7 -->
+  <rect x="480" y="170" width="170" height="80" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="565" y="195" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">7. Rework Code</text>
+  <text x="565" y="215" text-anchor="middle" fill="#991b1b" font-size="10">Code is weeks old 😞</text>
+  <text x="565" y="230" text-anchor="middle" fill="#991b1b" font-size="10">Context lost</text>
+  <text x="565" y="245" text-anchor="middle" fill="#dc2626" font-size="9">Replace component?</text>
+
+  <!-- Arrow -->
+  <polygon points="660,205 680,195 680,200 730,200 730,210 680,210 680,215" fill="#dc2626"/>
+
+  <!-- Step 8 -->
+  <rect x="700" y="170" width="170" height="80" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="785" y="195" text-anchor="middle" fill="#854d0e" font-size="12" font-weight="bold">8. Release (Maybe)</text>
+  <text x="785" y="215" text-anchor="middle" fill="#854d0e" font-size="10">Hope nothing missed</text>
+  <text x="785" y="230" text-anchor="middle" fill="#854d0e" font-size="10">🤞 fingers crossed</text>
+  <text x="785" y="245" text-anchor="middle" fill="#ca8a04" font-size="9">⏱️ Weeks late</text>
+
+  <!-- Result box -->
+  <rect x="60" y="280" width="780" height="100" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="450" y="305" text-anchor="middle" fill="#991b1b" font-size="16" font-weight="bold">Result: Late Detection, Manual Translation, No Enforcement</text>
+  
+  <text x="200" y="335" text-anchor="middle" fill="#7f1d1d" font-size="12">⏰ Weeks to feedback</text>
+  <text x="200" y="355" text-anchor="middle" fill="#7f1d1d" font-size="11">Compliance detected late</text>
+
+  <text x="450" y="335" text-anchor="middle" fill="#7f1d1d" font-size="12">📋 Inconsistent actions</text>
+  <text x="450" y="355" text-anchor="middle" fill="#7f1d1d" font-size="11">Varies by team/person</text>
+
+  <text x="700" y="335" text-anchor="middle" fill="#7f1d1d" font-size="12">🚫 No gates</text>
+  <text x="700" y="355" text-anchor="middle" fill="#7f1d1d" font-size="11">Non-compliant code ships</text>
+
+  <!-- Bottom stats -->
+  <rect x="60" y="400" width="250" height="80" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="185" y="425" text-anchor="middle" fill="#991b1b" font-size="14" font-weight="bold">2-3 Rework Cycles</text>
+  <text x="185" y="445" text-anchor="middle" fill="#7f1d1d" font-size="11">per release when issues</text>
+  <text x="185" y="465" text-anchor="middle" fill="#7f1d1d" font-size="11">are discovered late</text>
+
+  <rect x="325" y="400" width="250" height="80" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="450" y="425" text-anchor="middle" fill="#991b1b" font-size="14" font-weight="bold">Spreadsheet Tracking</text>
+  <text x="450" y="445" text-anchor="middle" fill="#7f1d1d" font-size="11">Not version-controlled</text>
+  <text x="450" y="465" text-anchor="middle" fill="#7f1d1d" font-size="11">Frequently outdated</text>
+
+  <rect x="590" y="400" width="250" height="80" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="715" y="425" text-anchor="middle" fill="#991b1b" font-size="14" font-weight="bold">Legal Bottleneck</text>
+  <text x="715" y="445" text-anchor="middle" fill="#7f1d1d" font-size="11">Edge cases create delays</text>
+  <text x="715" y="465" text-anchor="middle" fill="#7f1d1d" font-size="11">Blocks release progress</text>
+</svg>

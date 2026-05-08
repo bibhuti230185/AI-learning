@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" font-family="Arial, sans-serif">
+  <rect width="800" height="350" fill="#eff6ff" rx="12"/>
+  <text x="400" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e40af">🏁 Hackathon Scope — What We'll Build</text>
+
+  <!-- In scope -->
+  <rect x="30" y="50" width="450" height="280" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="255" y="75" text-anchor="middle" font-size="13" font-weight="bold" fill="#166534">✅ In Scope (Hackathon)</text>
+
+  <rect x="50" y="90" width="410" height="32" rx="5" fill="#dcfce7"/>
+  <text x="60" y="111" font-size="11" fill="#166534">1. Build Layer 1 deterministic rules (R01–R08) on PR diffs</text>
+
+  <rect x="50" y="130" width="410" height="32" rx="5" fill="#dcfce7"/>
+  <text x="60" y="151" font-size="11" fill="#166534">2. Index SW360 codebase into vector store</text>
+
+  <rect x="50" y="170" width="410" height="32" rx="5" fill="#dcfce7"/>
+  <text x="60" y="191" font-size="11" fill="#166534">3. Build Layer 2 RAG-powered checks (L01–L06)</text>
+
+  <rect x="50" y="210" width="410" height="32" rx="5" fill="#dcfce7"/>
+  <text x="60" y="231" font-size="11" fill="#166534">4. Build GitHub review poster (inline comments)</text>
+
+  <rect x="50" y="250" width="410" height="32" rx="5" fill="#dcfce7"/>
+  <text x="60" y="271" font-size="11" fill="#166534">5. Wire up as GitHub App webhook (auto on PR push)</text>
+
+  <rect x="50" y="290" width="410" height="32" rx="5" fill="#dcfce7"/>
+  <text x="60" y="311" font-size="11" fill="#166534">6. Demo: run on real SW360 PR, compare with human review</text>
+
+  <!-- Out of scope -->
+  <rect x="500" y="50" width="270" height="280" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="635" y="75" text-anchor="middle" font-size="13" font-weight="bold" fill="#991b1b">❌ Not In Scope</text>
+
+  <text x="520" y="105" font-size="11" fill="#991b1b">• Blocking PRs (REQUEST_CHANGES)</text>
+  <text x="520" y="135" font-size="11" fill="#991b1b">• Auto-fixing code</text>
+  <text x="520" y="165" font-size="11" fill="#991b1b">• Non-Java file review</text>
+  <text x="520" y="195" font-size="11" fill="#991b1b">• Replacing human reviewers</text>
+  <text x="520" y="225" font-size="11" fill="#991b1b">• Production deployment</text>
+  <text x="520" y="255" font-size="11" fill="#991b1b">• Large-scale tuning</text>
+</svg>
+

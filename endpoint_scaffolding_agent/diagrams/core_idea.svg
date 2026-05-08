@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" font-family="Arial, sans-serif">
+  <rect width="800" height="350" fill="#f0fdf4" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#166534">Core Idea: Agent Writes Boilerplate, Developer Writes Logic</text>
+
+  <!-- Left: Developer input -->
+  <rect x="40" y="70" width="200" height="100" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="140" y="100" text-anchor="middle" font-size="13" font-weight="bold" fill="#1d4ed8">🧑‍💻 Developer</text>
+  <text x="140" y="125" text-anchor="middle" font-size="11" fill="#1e40af">/scaffold GET</text>
+  <text x="140" y="142" text-anchor="middle" font-size="11" fill="#1e40af">/api/packages/{id}/vulns</text>
+  <text x="140" y="159" text-anchor="middle" font-size="11" fill="#1e40af">"Get vulnerabilities"</text>
+
+  <!-- Arrow -->
+  <path d="M 240 120 L 290 120" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)"/>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/></marker></defs>
+
+  <!-- Center: Agent -->
+  <rect x="290" y="60" width="220" height="220" rx="12" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">🤖 Scaffolding Agent</text>
+
+  <rect x="310" y="105" width="180" height="30" rx="5" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="400" y="125" text-anchor="middle" font-size="11" fill="#166534">📚 Retrieve patterns (RAG)</text>
+
+  <rect x="310" y="145" width="180" height="30" rx="5" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="400" y="165" text-anchor="middle" font-size="11" fill="#166534">⚙️ Generate code (LLM)</text>
+
+  <rect x="310" y="185" width="180" height="30" rx="5" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="400" y="205" text-anchor="middle" font-size="11" fill="#166534">✅ Validate (compile + rules)</text>
+
+  <rect x="310" y="225" width="180" height="30" rx="5" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="400" y="245" text-anchor="middle" font-size="11" fill="#166534">📤 Output PR / edits</text>
+
+  <!-- Arrow right -->
+  <path d="M 510 120 L 560 120" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow2)"/>
+  <defs><marker id="arrow2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/></marker></defs>
+
+  <!-- Right: Output -->
+  <rect x="560" y="60" width="200" height="130" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="660" y="90" text-anchor="middle" font-size="13" font-weight="bold" fill="#166534">📦 Output</text>
+  <text x="660" y="115" text-anchor="middle" font-size="11" fill="#166534">✅ Controller method</text>
+  <text x="660" y="135" text-anchor="middle" font-size="11" fill="#166534">✅ Service method</text>
+  <text x="660" y="155" text-anchor="middle" font-size="11" fill="#166534">✅ Test (with HTTP call)</text>
+  <text x="660" y="175" text-anchor="middle" font-size="11" fill="#166534">✅ All annotations correct</text>
+
+  <!-- Bottom note -->
+  <rect x="150" y="300" width="500" height="35" rx="8" fill="#bbf7d0" stroke="#16a34a"/>
+  <text x="400" y="323" text-anchor="middle" font-size="13" font-weight="bold" fill="#166534">Human focuses on business logic · Agent handles boilerplate</text>
+</svg>
+

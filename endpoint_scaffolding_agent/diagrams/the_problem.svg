@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="Arial, sans-serif">
+  <rect width="900" height="480" fill="#fef2f2" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#991b1b">The Problem: Manual Endpoint Creation</text>
+
+  <!-- File boxes showing 5-6 files -->
+  <rect x="30" y="60" width="150" height="70" rx="8" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="105" y="85" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">1. Controller.java</text>
+  <text x="105" y="102" text-anchor="middle" font-size="9" fill="#666">@Operation, @ApiResponse</text>
+  <text x="105" y="116" text-anchor="middle" font-size="9" fill="#666">@PreAuthorize, HATEOAS</text>
+
+  <rect x="200" y="60" width="150" height="70" rx="8" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="275" y="85" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">2. Service.java</text>
+  <text x="275" y="102" text-anchor="middle" font-size="9" fill="#666">SW360Assert, ThriftClient</text>
+  <text x="275" y="116" text-anchor="middle" font-size="9" fill="#666">Exception handling</text>
+
+  <rect x="370" y="60" width="150" height="70" rx="8" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="445" y="85" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">3. Test.java</text>
+  <text x="445" y="102" text-anchor="middle" font-size="9" fill="#666">TestRestTemplate call</text>
+  <text x="445" y="116" text-anchor="middle" font-size="9" fill="#666">⚠️ ArchUnit enforced</text>
+
+  <rect x="540" y="60" width="160" height="70" rx="8" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="620" y="85" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">4. JacksonMixins</text>
+  <text x="620" y="102" text-anchor="middle" font-size="9" fill="#666">ObjectMapper + SpringDoc</text>
+  <text x="620" y="116" text-anchor="middle" font-size="9" fill="#666">Dual registration</text>
+
+  <rect x="720" y="60" width="150" height="70" rx="8" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="795" y="85" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">5. AsciiDoc</text>
+  <text x="795" y="102" text-anchor="middle" font-size="9" fill="#666">REST docs</text>
+  <text x="795" y="116" text-anchor="middle" font-size="9" fill="#666">Documentation</text>
+
+  <!-- Arrow down -->
+  <text x="450" y="160" text-anchor="middle" font-size="14" fill="#991b1b">▼ Developer manually writes each one ▼</text>
+
+  <!-- Pain points -->
+  <rect x="50" y="180" width="800" height="280" rx="10" fill="#fff" stroke="#fca5a5" stroke-width="1"/>
+
+  <text x="450" y="210" text-anchor="middle" font-size="14" font-weight="bold" fill="#991b1b">Pain Points</text>
+
+  <!-- Clock icon area -->
+  <rect x="80" y="230" width="350" height="45" rx="6" fill="#fee2e2"/>
+  <text x="90" y="258" font-size="13" fill="#991b1b">⏱️  60–140 minutes per endpoint (newcomers)</text>
+
+  <rect x="80" y="285" width="350" height="45" rx="6" fill="#fee2e2"/>
+  <text x="90" y="313" font-size="13" fill="#991b1b">❌  ~40% of PRs fail CI (missing patterns)</text>
+
+  <rect x="80" y="340" width="350" height="45" rx="6" fill="#fee2e2"/>
+  <text x="90" y="368" font-size="13" fill="#991b1b">🔁  2–3 review rounds before merge</text>
+
+  <rect x="80" y="395" width="350" height="45" rx="6" fill="#fee2e2"/>
+  <text x="90" y="423" font-size="13" fill="#991b1b">🆕  New contributors fail 3–4 times</text>
+
+  <rect x="470" y="230" width="360" height="45" rx="6" fill="#fee2e2"/>
+  <text x="480" y="258" font-size="13" fill="#991b1b">🧩  5–6 files across multiple modules</text>
+
+  <rect x="470" y="285" width="360" height="45" rx="6" fill="#fee2e2"/>
+  <text x="480" y="313" font-size="13" fill="#991b1b">📏  Inconsistent code across developers</text>
+
+  <rect x="470" y="340" width="360" height="45" rx="6" fill="#fee2e2"/>
+  <text x="480" y="368" font-size="13" fill="#991b1b">🏗️  ArchUnit rejects tests without HTTP calls</text>
+
+  <rect x="470" y="395" width="360" height="45" rx="6" fill="#fee2e2"/>
+  <text x="480" y="423" font-size="13" fill="#991b1b">😤  Reviewer fatigue from repetitive issues</text>
+</svg>
+

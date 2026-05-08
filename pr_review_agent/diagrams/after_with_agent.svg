@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" font-family="Arial, sans-serif">
+  <rect width="800" height="420" fill="#f0fdf4" rx="12"/>
+  <text x="400" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#166534">✅ AFTER — With the Two-Layer Review Agent</text>
+
+  <!-- Trigger -->
+  <rect x="200" y="50" width="400" height="40" rx="8" fill="#1e293b" stroke="#16a34a" stroke-width="2"/>
+  <text x="400" y="75" text-anchor="middle" font-size="12" fill="#4ade80" font-family="monospace">Developer pushes PR → webhook triggers agent</text>
+
+  <line x1="400" y1="90" x2="400" y2="105" stroke="#16a34a" stroke-width="2"/>
+
+  <!-- Layer 1 -->
+  <rect x="150" y="105" width="500" height="60" rx="8" fill="#fff" stroke="#059669" stroke-width="1.5"/>
+  <text x="400" y="127" text-anchor="middle" font-size="12" font-weight="bold" fill="#059669">⚡ Layer 1: Deterministic Lint (&lt;10 seconds, no LLM, $0)</text>
+  <text x="400" y="148" text-anchor="middle" font-size="10" fill="#065f46">R01-R08: Headers, System.out, @Autowired, @PreAuthorize, @Operation, Logger, Signed-off-by</text>
+
+  <line x1="400" y1="165" x2="400" y2="180" stroke="#16a34a" stroke-width="2"/>
+
+  <!-- Layer 2 -->
+  <rect x="150" y="180" width="500" height="60" rx="8" fill="#fff" stroke="#059669" stroke-width="1.5"/>
+  <text x="400" y="202" text-anchor="middle" font-size="12" font-weight="bold" fill="#059669">🧠 Layer 2: RAG Deep Review (30-60 seconds, ~$0.05)</text>
+  <text x="400" y="223" text-anchor="middle" font-size="10" fill="#065f46">L01-L06: Test HTTP call, null-safety, Jackson mixin, exception pattern, cross-file consistency</text>
+
+  <line x1="400" y1="240" x2="400" y2="255" stroke="#16a34a" stroke-width="2"/>
+
+  <!-- Post review -->
+  <rect x="150" y="255" width="500" height="50" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="400" y="277" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">📝 Inline Comments Posted (&lt;60 sec from push)</text>
+  <text x="400" y="295" text-anchor="middle" font-size="10" fill="#166534">With fix suggestions, code examples, and links to docs</text>
+
+  <line x1="400" y1="305" x2="400" y2="320" stroke="#16a34a" stroke-width="2"/>
+
+  <!-- Human review -->
+  <rect x="200" y="320" width="400" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="400" y="342" text-anchor="middle" font-size="12" font-weight="bold" fill="#1d4ed8">👤 Human reviews ONLY logic/architecture</text>
+  <text x="400" y="360" text-anchor="middle" font-size="10" fill="#1e40af">Pattern issues already caught — reviewer skips those</text>
+
+  <!-- Stats -->
+  <rect x="670" y="120" width="110" height="50" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="725" y="145" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">&lt; 60s</text>
+  <text x="725" y="162" text-anchor="middle" font-size="9" fill="#166534">first feedback</text>
+
+  <rect x="670" y="185" width="110" height="50" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="725" y="210" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">100%</text>
+  <text x="725" y="227" text-anchor="middle" font-size="9" fill="#166534">patterns caught</text>
+
+  <!-- Bottom -->
+  <rect x="150" y="385" width="500" height="25" rx="6" fill="#16a34a"/>
+  <text x="400" y="402" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Result: 1 review round · ~1 day to merge · zero mechanical issues reach human</text>
+</svg>
+

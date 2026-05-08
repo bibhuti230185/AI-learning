@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" font-family="Arial, sans-serif">
+  <rect width="800" height="320" fill="#f0fdf4" rx="12"/>
+  <text x="400" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#166534">✅ Why This Is Feasible</text>
+
+  <!-- 6 evidence boxes in 2x3 grid -->
+  <rect x="30" y="55" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="150" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">📄 Patterns Documented</text>
+  <text x="150" y="98" text-anchor="middle" font-size="10" fill="#065f46">sw360_backend.instructions.md</text>
+  <text x="150" y="113" text-anchor="middle" font-size="10" fill="#065f46">defines all conventions explicitly</text>
+
+  <rect x="280" y="55" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="400" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">⚡ Layer 1 is Pure Regex</text>
+  <text x="400" y="98" text-anchor="middle" font-size="10" fill="#065f46">No LLM needed for R01-R08</text>
+  <text x="400" y="113" text-anchor="middle" font-size="10" fill="#065f46">Zero cost, instant, deterministic</text>
+
+  <rect x="530" y="55" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="650" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🔗 GitHub API Ready</text>
+  <text x="650" y="98" text-anchor="middle" font-size="10" fill="#065f46">Supports inline review comments</text>
+  <text x="650" y="113" text-anchor="middle" font-size="10" fill="#065f46">on exact diff lines</text>
+
+  <rect x="30" y="145" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="150" y="168" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🔍 RAG Proven</text>
+  <text x="150" y="188" text-anchor="middle" font-size="10" fill="#065f46">Same vector store as</text>
+  <text x="150" y="203" text-anchor="middle" font-size="10" fill="#065f46">Scaffolding Agent concept</text>
+
+  <rect x="280" y="145" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="400" y="168" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🔄 Simple Feedback Loop</text>
+  <text x="400" y="188" text-anchor="middle" font-size="10" fill="#065f46">👍/👎 reactions on comments</text>
+  <text x="400" y="203" text-anchor="middle" font-size="10" fill="#065f46">→ log → adjust thresholds</text>
+
+  <rect x="530" y="145" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="650" y="168" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">💰 Negligible Cost</text>
+  <text x="650" y="188" text-anchor="middle" font-size="10" fill="#065f46">Layer 1: $0. Layer 2: ~$0.05/PR</text>
+  <text x="650" y="203" text-anchor="middle" font-size="10" fill="#065f46">&lt;$3/month for 10 PRs/week</text>
+
+  <!-- Bottom -->
+  <rect x="100" y="250" width="600" height="50" rx="10" fill="#16a34a"/>
+  <text x="400" y="275" text-anchor="middle" font-size="13" font-weight="bold" fill="white">All building blocks exist. Layer 1 is trivial. Layer 2 reuses existing RAG.</text>
+  <text x="400" y="293" text-anchor="middle" font-size="11" fill="#bbf7d0">Hackathon = integrate + tune + demo on real PRs</text>
+</svg>
+

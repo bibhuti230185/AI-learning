@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" font-family="Arial, sans-serif">
+  <rect width="800" height="320" fill="#f0fdf4" rx="12"/>
+  <text x="400" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#166534">✅ Why This Is Feasible</text>
+
+  <!-- 6 evidence boxes in 2x3 grid -->
+  <rect x="30" y="55" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="150" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">📐 Regular Patterns</text>
+  <text x="150" y="98" text-anchor="middle" font-size="10" fill="#065f46">All Controllers follow the</text>
+  <text x="150" y="113" text-anchor="middle" font-size="10" fill="#065f46">same structure — easy to learn</text>
+
+  <rect x="280" y="55" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="400" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🏗️ ArchUnit Well-Defined</text>
+  <text x="400" y="98" text-anchor="middle" font-size="10" fill="#065f46">Agent validates against the</text>
+  <text x="400" y="113" text-anchor="middle" font-size="10" fill="#065f46">exact same rules CI uses</text>
+
+  <rect x="530" y="55" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="650" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">📄 Thrift is Structured</text>
+  <text x="650" y="98" text-anchor="middle" font-size="10" fill="#065f46">.thrift files parse cleanly →</text>
+  <text x="650" y="113" text-anchor="middle" font-size="10" fill="#065f46">agent knows available methods</text>
+
+  <rect x="30" y="145" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="150" y="168" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🔍 RAG is Proven</text>
+  <text x="150" y="188" text-anchor="middle" font-size="10" fill="#065f46">Vector similarity on code</text>
+  <text x="150" y="203" text-anchor="middle" font-size="10" fill="#065f46">embeddings works well</text>
+
+  <rect x="280" y="145" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="400" y="168" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🧠 LLM Code Gen Mature</text>
+  <text x="400" y="188" text-anchor="middle" font-size="10" fill="#065f46">GPT-4o reliably produces Java</text>
+  <text x="400" y="203" text-anchor="middle" font-size="10" fill="#065f46">when given good examples</text>
+
+  <rect x="530" y="145" width="240" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="650" y="168" text-anchor="middle" font-size="11" font-weight="bold" fill="#166534">🔄 Validation Loop</text>
+  <text x="650" y="188" text-anchor="middle" font-size="10" fill="#065f46">Compile + annotation check</text>
+  <text x="650" y="203" text-anchor="middle" font-size="10" fill="#065f46">→ 3 retries before giving up</text>
+
+  <!-- Bottom summary -->
+  <rect x="100" y="250" width="600" height="50" rx="10" fill="#16a34a"/>
+  <text x="400" y="275" text-anchor="middle" font-size="13" font-weight="bold" fill="white">All building blocks exist. We just need to wire them together.</text>
+  <text x="400" y="293" text-anchor="middle" font-size="11" fill="#bbf7d0">Hackathon = integration + demo, not research</text>
+</svg>
+

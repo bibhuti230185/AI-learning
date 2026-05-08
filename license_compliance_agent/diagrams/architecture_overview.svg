@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="550" fill="#f8fafc" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#1e293b" font-size="20" font-weight="bold">🏗️ Architecture Overview — How the Pieces Connect</text>
+
+  <!-- Developer IDE (VS Code) -->
+  <rect x="40" y="60" width="200" height="140" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <text x="140" y="85" text-anchor="middle" fill="#075985" font-size="14" font-weight="bold">VS Code IDE</text>
+  <rect x="55" y="95" width="170" height="30" rx="5" fill="#bae6fd" stroke="#0284c7" stroke-width="1"/>
+  <text x="140" y="115" text-anchor="middle" fill="#075985" font-size="11">package.json</text>
+  <rect x="55" y="130" width="170" height="30" rx="5" fill="#bae6fd" stroke="#0284c7" stroke-width="1"/>
+  <text x="140" y="150" text-anchor="middle" fill="#075985" font-size="11">pom.xml / requirements.txt</text>
+  <text x="140" y="185" text-anchor="middle" fill="#0284c7" font-size="10">Developer edits files</text>
+
+  <!-- Arrow: IDE → Watcher -->
+  <line x1="240" y1="130" x2="290" y2="130" stroke="#0284c7" stroke-width="2" stroke-dasharray="5,3"/>
+  <polygon points="290,125 300,130 290,135" fill="#0284c7"/>
+  <text x="265" y="120" text-anchor="middle" fill="#0284c7" font-size="9">Change event</text>
+
+  <!-- LicenseLens AI Agent Block -->
+  <rect x="300" y="55" width="350" height="400" rx="12" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="475" y="80" text-anchor="middle" fill="#854d0e" font-size="16" font-weight="bold">🧠 LicenseLens AI Agent</text>
+
+  <!-- Component 1: Watcher -->
+  <rect x="320" y="95" width="130" height="60" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="385" y="115" text-anchor="middle" fill="#065f46" font-size="11" font-weight="bold">👁️ Watcher</text>
+  <text x="385" y="135" text-anchor="middle" fill="#065f46" font-size="9">Monitors dep files</text>
+  <text x="385" y="148" text-anchor="middle" fill="#065f46" font-size="9">for changes</text>
+
+  <!-- Arrow: Watcher → Resolver -->
+  <line x1="385" y1="155" x2="385" y2="175" stroke="#059669" stroke-width="2"/>
+  <polygon points="380,175 385,185 390,175" fill="#059669"/>
+
+  <!-- Component 2: Resolver -->
+  <rect x="320" y="185" width="130" height="60" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="385" y="205" text-anchor="middle" fill="#5b21b6" font-size="11" font-weight="bold">🔍 Resolver</text>
+  <text x="385" y="225" text-anchor="middle" fill="#5b21b6" font-size="9">Queries license</text>
+  <text x="385" y="238" text-anchor="middle" fill="#5b21b6" font-size="9">from data source</text>
+
+  <!-- Arrow: Resolver → Classifier -->
+  <line x1="385" y1="245" x2="385" y2="265" stroke="#7c3aed" stroke-width="2"/>
+  <polygon points="380,265 385,275 390,265" fill="#7c3aed"/>
+
+  <!-- Component 3: Classifier -->
+  <rect x="320" y="275" width="130" height="70" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="385" y="295" text-anchor="middle" fill="#991b1b" font-size="11" font-weight="bold">🧠 Classifier</text>
+  <text x="385" y="315" text-anchor="middle" fill="#991b1b" font-size="9">AI maps license</text>
+  <text x="385" y="328" text-anchor="middle" fill="#991b1b" font-size="9">to obligations</text>
+  <text x="385" y="341" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="bold">🔴 🟡 🔵</text>
+
+  <!-- Component 4: Generator -->
+  <rect x="500" y="95" width="130" height="60" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="565" y="115" text-anchor="middle" fill="#9a3412" font-size="11" font-weight="bold">📝 Generator</text>
+  <text x="565" y="135" text-anchor="middle" fill="#9a3412" font-size="9">Creates checklist</text>
+  <text x="565" y="148" text-anchor="middle" fill="#9a3412" font-size="9">.md file</text>
+
+  <!-- Component 5: IDE Panel -->
+  <rect x="500" y="185" width="130" height="60" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="565" y="205" text-anchor="middle" fill="#075985" font-size="11" font-weight="bold">🖥️ IDE Panel</text>
+  <text x="565" y="225" text-anchor="middle" fill="#075985" font-size="9">Shows checklist</text>
+  <text x="565" y="238" text-anchor="middle" fill="#075985" font-size="9">+ notifications</text>
+
+  <!-- Component 6: Enforcer -->
+  <rect x="500" y="275" width="130" height="70" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="565" y="295" text-anchor="middle" fill="#065f46" font-size="11" font-weight="bold">🚦 Enforcer</text>
+  <text x="565" y="315" text-anchor="middle" fill="#065f46" font-size="9">Pre-commit hook</text>
+  <text x="565" y="328" text-anchor="middle" fill="#065f46" font-size="9">Build gate</text>
+  <text x="565" y="341" text-anchor="middle" fill="#059669" font-size="9" font-weight="bold">Block if 🔴 open</text>
+
+  <!-- Arrows from Classifier to right side -->
+  <line x1="450" y1="305" x2="500" y2="125" stroke="#ea580c" stroke-width="1.5"/>
+  <polygon points="495,128 500,120 505,128" fill="#ea580c"/>
+  
+  <line x1="450" y1="310" x2="500" y2="215" stroke="#0284c7" stroke-width="1.5"/>
+  <polygon points="495,213 500,210 505,215" fill="#0284c7"/>
+  
+  <line x1="450" y1="315" x2="500" y2="305" stroke="#059669" stroke-width="1.5"/>
+  <polygon points="495,303 500,300 505,305" fill="#059669"/>
+
+  <!-- OD Catalog -->
+  <rect x="320" y="365" width="310" height="75" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="475" y="390" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">📚 Obligation Dimensions Catalog</text>
+  <text x="475" y="410" text-anchor="middle" fill="#92400e" font-size="9">OD-01 through OD-12</text>
+  <text x="475" y="425" text-anchor="middle" fill="#92400e" font-size="9">Attribution, Modification, Distribution, Patents, etc.</text>
+
+  <!-- External Systems -->
+  <rect x="680" y="60" width="180" height="150" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="770" y="85" text-anchor="middle" fill="#5b21b6" font-size="14" font-weight="bold">Compliance Sources</text>
+  <rect x="695" y="95" width="150" height="35" rx="6" fill="#ddd6fe" stroke="#7c3aed" stroke-width="1"/>
+  <text x="770" y="118" text-anchor="middle" fill="#5b21b6" font-size="11">SW360 API</text>
+  <rect x="695" y="135" width="150" height="35" rx="6" fill="#ddd6fe" stroke="#7c3aed" stroke-width="1"/>
+  <text x="770" y="158" text-anchor="middle" fill="#5b21b6" font-size="11">FOSSology API</text>
+  <rect x="695" y="175" width="150" height="30" rx="6" fill="#f3e8ff" stroke="#a78bfa" stroke-width="1"/>
+  <text x="770" y="195" text-anchor="middle" fill="#7c3aed" font-size="10">(or mock source)</text>
+
+  <!-- Arrow: Resolver → External -->
+  <line x1="450" y1="210" x2="680" y2="140" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3"/>
+  <polygon points="675,143 680,135 685,143" fill="#7c3aed"/>
+  <text x="565" y="165" fill="#7c3aed" font-size="9">License query</text>
+
+  <!-- Output: Project Files -->
+  <rect x="680" y="230" width="180" height="100" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="770" y="255" text-anchor="middle" fill="#065f46" font-size="14" font-weight="bold">Project Output</text>
+  <rect x="695" y="265" width="150" height="25" rx="5" fill="#bbf7d0" stroke="#059669" stroke-width="1"/>
+  <text x="770" y="283" text-anchor="middle" fill="#065f46" font-size="10">COMPLIANCE_CHECKLIST.md</text>
+  <rect x="695" y="295" width="150" height="25" rx="5" fill="#bbf7d0" stroke="#059669" stroke-width="1"/>
+  <text x="770" y="313" text-anchor="middle" fill="#065f46" font-size="10">.git/hooks/pre-commit</text>
+
+  <!-- Arrow: Generator → Output -->
+  <line x1="630" y1="125" x2="680" y2="260" stroke="#ea580c" stroke-width="2"/>
+  <polygon points="675,255 680,265 685,260" fill="#ea580c"/>
+
+  <!-- LLM Cloud -->
+  <rect x="680" y="350" width="180" height="80" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="770" y="375" text-anchor="middle" fill="#991b1b" font-size="14" font-weight="bold">LLM (GPT-4o)</text>
+  <text x="770" y="395" text-anchor="middle" fill="#991b1b" font-size="10">Interprets license</text>
+  <text x="770" y="410" text-anchor="middle" fill="#991b1b" font-size="10">→ Obligation mapping</text>
+  <text x="770" y="425" text-anchor="middle" fill="#dc2626" font-size="9">🔴 🟡 🔵 classification</text>
+
+  <!-- Arrow: Classifier → LLM -->
+  <line x1="450" y1="320" x2="680" y2="390" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
+  <polygon points="675,387 680,395 685,390" fill="#dc2626"/>
+
+  <!-- Flow description -->
+  <rect x="40" y="470" width="820" height="65" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+  <text x="450" y="495" text-anchor="middle" fill="#475569" font-size="12" font-weight="bold">Flow: Dep change → Watcher → Resolver (SW360) → Classifier (LLM) → Generator (checklist) → Enforcer (hooks)</text>
+  <text x="450" y="520" text-anchor="middle" fill="#64748b" font-size="11">Developer sees checklist immediately in VS Code. Commit blocked until 🔴 items resolved.</text>
+</svg>

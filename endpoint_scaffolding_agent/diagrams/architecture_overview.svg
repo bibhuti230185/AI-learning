@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" font-family="Arial, sans-serif">
+  <rect width="900" height="450" fill="#f8fafc" rx="12"/>
+  <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e293b">Architecture Overview — How the Pieces Connect</text>
+
+  <!-- Developer -->
+  <rect x="30" y="180" width="130" height="60" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="95" y="207" text-anchor="middle" font-size="12" font-weight="bold" fill="#1d4ed8">🧑‍💻 Developer</text>
+  <text x="95" y="225" text-anchor="middle" font-size="10" fill="#1d4ed8">/scaffold command</text>
+
+  <!-- Arrow -->
+  <path d="M 160 210 L 210 210" stroke="#2563eb" stroke-width="2" marker-end="url(#arr1)"/>
+  <defs><marker id="arr1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker></defs>
+
+  <!-- Agent Orchestrator -->
+  <rect x="210" y="130" width="180" height="160" rx="10" fill="#fff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="300" y="155" text-anchor="middle" font-size="12" font-weight="bold" fill="#7c3aed">🤖 Agent Orchestrator</text>
+  <text x="300" y="180" text-anchor="middle" font-size="10" fill="#6b21a8">Parse input</text>
+  <text x="300" y="200" text-anchor="middle" font-size="10" fill="#6b21a8">Call retriever</text>
+  <text x="300" y="220" text-anchor="middle" font-size="10" fill="#6b21a8">Call generator</text>
+  <text x="300" y="240" text-anchor="middle" font-size="10" fill="#6b21a8">Call validator</text>
+  <text x="300" y="260" text-anchor="middle" font-size="10" fill="#6b21a8">Retry if needed</text>
+  <text x="300" y="280" text-anchor="middle" font-size="10" fill="#6b21a8">Output results</text>
+
+  <!-- Vector Store -->
+  <rect x="450" y="50" width="160" height="80" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="530" y="75" text-anchor="middle" font-size="12" font-weight="bold" fill="#5b21b6">📚 Vector Store</text>
+  <text x="530" y="95" text-anchor="middle" font-size="10" fill="#6b21a8">Controllers, Services</text>
+  <text x="530" y="112" text-anchor="middle" font-size="10" fill="#6b21a8">Tests, .thrift files</text>
+
+  <path d="M 390 170 L 450 95" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4"/>
+
+  <!-- LLM -->
+  <rect x="450" y="160" width="160" height="70" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="530" y="185" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">🧠 LLM (GPT-4o)</text>
+  <text x="530" y="205" text-anchor="middle" font-size="10" fill="#92400e">Code generation</text>
+  <text x="530" y="220" text-anchor="middle" font-size="10" fill="#92400e">Pattern following</text>
+
+  <path d="M 390 210 L 450 195" stroke="#d97706" stroke-width="1.5"/>
+
+  <!-- Validator -->
+  <rect x="450" y="260" width="160" height="80" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="530" y="285" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">✅ Validator</text>
+  <text x="530" y="305" text-anchor="middle" font-size="10" fill="#065f46">Annotation check</text>
+  <text x="530" y="320" text-anchor="middle" font-size="10" fill="#065f46">HTTP test check</text>
+  <text x="530" y="335" text-anchor="middle" font-size="10" fill="#065f46">mvn compile</text>
+
+  <path d="M 390 260 L 450 290" stroke="#059669" stroke-width="1.5"/>
+
+  <!-- Retry loop -->
+  <path d="M 530 340 C 530 380 300 380 300 290" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4" fill="none" marker-end="url(#arr2)"/>
+  <text x="420" y="395" text-anchor="middle" font-size="10" fill="#dc2626">retry if failed (max 3)</text>
+  <defs><marker id="arr2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker></defs>
+
+  <!-- Output: GitHub PR -->
+  <rect x="680" y="170" width="180" height="80" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="770" y="195" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">📤 Output</text>
+  <text x="770" y="215" text-anchor="middle" font-size="10" fill="#166534">GitHub PR with:</text>
+  <text x="770" y="232" text-anchor="middle" font-size="10" fill="#166534">Controller + Service + Test</text>
+  <text x="770" y="245" text-anchor="middle" font-size="10" fill="#166534">or IDE workspace edits</text>
+
+  <path d="M 610 210 L 680 210" stroke="#16a34a" stroke-width="2" marker-end="url(#arr3)"/>
+  <defs><marker id="arr3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#16a34a"/></marker></defs>
+</svg>
+
