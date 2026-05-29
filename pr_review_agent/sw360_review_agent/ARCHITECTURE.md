@@ -130,26 +130,27 @@ flowchart TD
     JAVA -- Yes --> LAYER1
 
     subgraph LAYER1["Layer 1 — Deterministic (< 10s, $0)"]
-        R01["R01: License header"]
-        R02["R02: No System.out"]
-        R03["R03: No printStackTrace"]
-        R04["R04: No field @Autowired"]
-        R05["R05: @PreAuthorize"]
-        R06["R06: @Operation"]
-        R07["R07: Log4j2 logger"]
-        R08["R08: Signed-off-by"]
+        R01["R01: Signed-off-by (DCO)"]
+        R02["R02: Thrift null-safety"]
+        R03["R03: No hardcoded credentials"]
+        R04["R04: Unbounded collection fetch"]
+        R05["R05: Missing migration script"]
+        R06["R06: No catch(Exception)"]
     end
 
     LAYER1 --> LAYER2
 
-    subgraph LAYER2["Layer 2 — RAG + LLM (30-60s, ~$0.05)"]
+    subgraph LAYER2["Layer 2 — RAG + LLM (30-90s, ~$0.05)"]
+        direction TB
         RAG1["Retrieve rules for file type"]
         RAG2["Retrieve reference implementation"]
         RAG3["Retrieve cross-file context"]
-        ANALYZE["LLM analyzes diff vs context"]
-        RAG1 --> ANALYZE
-        RAG2 --> ANALYZE
-        RAG3 --> ANALYZE
+        FOCUS["Apply file-type-specific prompt<br/>(controller/service/handler/test/thrift)"]
+        ANALYZE["LLM analyzes diff vs context<br/>L01-L12 expert rules"]
+        RAG1 --> FOCUS
+        RAG2 --> FOCUS
+        RAG3 --> FOCUS
+        FOCUS --> ANALYZE
     end
 
     LAYER2 --> MERGE[Merge + Deduplicate]

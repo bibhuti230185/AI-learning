@@ -60,10 +60,8 @@ The review agent has **two layers** that run sequentially on every PR.
 
 | Layer | What | Speed | Cost | Catches |
 |-------|------|-------|------|---------|
-| **Layer 1** | Deterministic regex/pattern checks | <10 sec | $0 | Mechanical violations (R01-R08) |
-| **Layer 2** | RAG-powered LLM analysis | 30-60 sec | ~$0.05/PR | Contextual issues (L01-L06) |
-
-Both layers produce structured review comments. They are merged, deduplicated, and posted as a single GitHub review.
+| **Layer 1** | Deterministic checks (complement ArchUnit/CI) | <10 sec | $0 | R01-R06: DCO, null-safety, credentials, pagination, migrations, exception types |
+| **Layer 2** | RAG-powered LLM analysis with file-type prompts | 30-90 sec | ~$0.05/PR | L01-L12: API compat, Jackson, HATEOAS, null-safety, exceptions, cross-file, CouchDB, tests, permissions |
 
 ---
 
@@ -83,7 +81,7 @@ Both layers produce structured review comments. They are merged, deduplicated, a
             ├─ Step 2 ──► Classify files: controller/service/test/thrift/other
             │
             │  ══════ LAYER 1: DETERMINISTIC ═══════════════════════
-            ├─ Step 3 ──► Run R01-R08 on each changed file (regex/grep)
+            ├─ Step 3 ──► Run R01-R06 on each changed file (complements ArchUnit)
             │
             │  ══════ LAYER 2: RAG + LLM ═══════════════════════════
             ├─ Step 4 ──► Vector Store: retrieve rules for file type
@@ -171,18 +169,20 @@ Each file is classified based on path and name:
 
 **Agent calls:** `run_deterministic_checks`
 
-For each changed Java file, runs all applicable rules:
+For each changed Java file, runs all applicable rules.
+These rules intentionally complement ArchUnit (78 tests) and CI — no overlap.
 
 | Rule | Check | Detection | Applies to |
-|------|-------|-----------|-----------|
-| **R01** | EPL-2.0 license header | `grep SPDX` in first 15 lines | New files only |
-| **R02** | No System.out.println | `grep System.out.print` in added lines | All Java |
-| **R03** | No e.printStackTrace() | `grep .printStackTrace()` in added lines | All Java |
-| **R04** | No @Autowired on fields | Regex: `@Autowired\s+private` in added lines | All Java |
-| **R05** | @PreAuthorize on writes | @Post/@Put/@Patch/@Delete without @PreAuthorize within 5 lines above | Controllers |
-| **R06** | @Operation on endpoints | Any @*Mapping without @Operation within 10 lines above | Controllers |
-| **R07** | Logger uses Log4j2 | `LoggerFactory.getLogger` in added lines (should be LogManager) | All Java |
-| **R08** | Commits signed-off | `Signed-off-by:` in commit messages | Commit level |
+|------|-------|-----------|----------|
+| **R01** | Commits have Signed-off-by | `Signed-off-by:` in commit messages | Commit level |
+| **R02** | Thrift null-safety | Chained Thrift calls without null-check | All Java |
+| **R03** | No hardcoded credentials | Regex for password/token/apikey literals | All Java (excl. tests) |
+| **R04** | Unbounded collection fetch | `getAll/findAll/listAll` without pagination | All Java |
+| **R05** | Missing migration script | New Thrift fields without migration | .thrift files |
+| **R06** | No generic catch(Exception) | `catch (Exception e)` (use specific types) | All Java (excl. tests) |
+
+> **Note:** License headers, System.out, @Autowired, @PreAuthorize, @Operation, and LoggerFactory
+> are already enforced by ArchUnit and CI. We don't duplicate those checks.
 
 **Output:** List of `ReviewComment` objects:
 ```python
@@ -500,16 +500,19 @@ This is used later when developers react with 👍/👎 to track true/false posi
 
 ## 8. Deterministic Rules Reference
 
+These rules **complement** ArchUnit (78 tests) and CI. They only check what those tools miss.
+
 | ID | Name | Severity | Applies to | Detection |
-|----|------|----------|-----------|-----------|
-| R01 | License header | error | New `.java` files | `grep SPDX-License-Identifier` in lines 1-15 |
-| R02 | No System.out | error | All Java | `grep System.out.print` in added lines |
-| R03 | No printStackTrace | error | All Java | `grep .printStackTrace()` in added lines |
-| R04 | No field @Autowired | warning | All Java | Regex: `@Autowired\s+(private\|protected)` |
-| R05 | @PreAuthorize on writes | warning | Controllers | @Post/@Put/@Patch/@Delete without @PreAuthorize above |
-| R06 | @Operation on endpoints | warning | Controllers | @*Mapping without @Operation above |
-| R07 | Logger pattern | warning | All Java | `LoggerFactory.getLogger` (should be LogManager) |
-| R08 | Signed-off-by | error | Commits | Missing `Signed-off-by:` in commit message |
+|----|------|----------|-----------|----------|
+| R01 | Signed-off-by (DCO) | error | Commits | Missing `Signed-off-by:` in commit message |
+| R02 | Thrift null-safety | warning | All Java | Chained Thrift client calls without null-check |
+| R03 | No hardcoded credentials | error | All Java (excl. tests) | Regex for password/token/apikey string literals |
+| R04 | Unbounded collection fetch | warning | All Java | `getAll/findAll/listAll` without pagination context |
+| R05 | Missing migration script | warning | .thrift files | New numbered fields without migration in scripts/ |
+| R06 | No catch(Exception) | warning | All Java (excl. tests) | `catch (Exception e)` — should use specific types |
+
+> **What ArchUnit/CI already enforces (we skip):** license headers, System.out, printStackTrace,
+> @Autowired fields, @PreAuthorize, @Operation, LoggerFactory, naming conventions, banned imports.
 
 ---
 
@@ -537,31 +540,30 @@ This is used later when developers react with 👍/👎 to track true/false posi
 ```
 TOOLS registry (PRReviewAgent)
 │
-├── fetch_pr_diff                  → github.pr_analyzer.get_changed_files()
-├── classify_files                 → github.pr_analyzer.classify_file()
+├── fetch_pr_diff                  → github_client.GitHubClient.get_pr_files()
+├── classify_files                 → github_client.classify_file()
 │
 │  ── Layer 1 ──
-├── run_deterministic_checks       → validators.lint_rules.DeterministicLinter.check()
-│                                       ├── check_license_header()
-│                                       ├── check_system_out()
-│                                       ├── check_print_stack_trace()
-│                                       ├── check_field_autowired()
-│                                       ├── check_preauthorize()
-│                                       ├── check_operation_annotation()
-│                                       ├── check_logger_pattern()
-│                                       └── check_signed_off()
+├── run_deterministic_checks       → lint_rules.DeterministicLinter.check_all()
+│                                       ├── check_signed_off()
+│                                       ├── check_thrift_null_safety()
+│                                       ├── check_hardcoded_credentials()
+│                                       ├── check_unbounded_collection_fetch()
+│                                       ├── check_missing_migration_script()
+│                                       └── check_catch_generic_exception()
 │
 │  ── Layer 2 ──
-├── retrieve_applicable_rules      → retriever.retrieve(type=rule)
-├── retrieve_reference             → retriever.retrieve(type={file_type}_method)
-├── retrieve_cross_file_context    → retriever.retrieve(type=test_method, jackson_mixin, handler_method)
-├── llm_review_file                → agents.review._llm_review()
-│                                       └── llm.generate(review_system_prompt + context)
+├── retrieve_applicable_rules      → retriever.retrieve_rules(file_type)
+├── retrieve_reference             → retriever.retrieve_reference(entity, file_type)
+├── retrieve_cross_file_context    → retriever.retrieve_cross_file_context(entity, file_type)
+├── llm_review_file                → llm_reviewer.LLMReviewer.review_file()
+│                                       ├── File-type-specific prompt selection
+│                                       └── LLM analysis (L01–L12 rules)
 │
 │  ── Post Review ──
-├── merge_findings                 → agents.review._deduplicate_and_prioritize()
-├── post_review                    → github.reviewer.post_review()
-└── store_review_context           → feedback.collector.store_context()
+├── merge_findings                 → agent._deduplicate()
+├── post_review                    → github_client.GitHubClient.post_review()
+└── store_review_context           → (future: feedback collection)
 ```
 
 ---

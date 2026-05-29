@@ -266,27 +266,38 @@ The approach splits at the **cost/accuracy boundary**:
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │  LAYER 1 — DETERMINISTIC LINTER (< 10 seconds, no LLM)              │
+│  (Complements ArchUnit 78 tests + CI — no overlap)                   │
 │                                                                      │
-│  • R01: License header on new files                                  │
-│  • R02: No System.out.println                                        │
-│  • R03: No e.printStackTrace()                                       │
-│  • R04: No @Autowired on fields                                      │
-│  • R05: @PreAuthorize on write endpoints                             │
-│  • R06: @Operation on endpoint methods                               │
-│  • R07: Logger uses LogManager.getLogger() (not SLF4J)               │
-│  • R08: Commits have Signed-off-by                                   │
+│  • R01: Commits have Signed-off-by (DCO/ECA)                        │
+│  • R02: Thrift client return values null-checked                     │
+│  • R03: No hardcoded credentials/secrets                             │
+│  • R04: Unbounded collection fetch (missing pagination)              │
+│  • R05: New Thrift fields need CouchDB migration script              │
+│  • R06: No catch(Exception) — use specific types                     │
 └──────────────────────────────────────────────────────────────────────┘
                               │
               ╔═══════════════▼══════════════════╗
               ║   LAYER 2 — RAG DEEP REVIEW      ║
               ║   (contextual, grounded in code)  ║
+              ║   File-type-specific prompts for:  ║
+              ║   controller/service/handler/test  ║
               ║                                   ║
-              ║  • L01: Test exercises HTTP?       ║
-              ║  • L02: Thrift null-safety?        ║
-              ║  • L03: Jackson mixin needed?      ║
-              ║  • L04: Exception pattern correct? ║
-              ║  • L05: Cross-file consistency?    ║
-              ║  • L06: Reference pattern match?   ║
+              ║  REST API:                         ║
+              ║  • L01: API backward compat?       ║
+              ║  • L02: Jackson mixin registered?  ║
+              ║  • L03: HATEOAS response format?   ║
+              ║  Service/Thrift:                    ║
+              ║  • L04: Thrift null-safety?         ║
+              ║  • L05: Exception chain correct?    ║
+              ║  • L06: Cross-file consistency?     ║
+              ║  CouchDB:                           ║
+              ║  • L07: Query efficiency (N+1)?     ║
+              ║  • L08: Pagination correctness?     ║
+              ║  • L09: View design correct?        ║
+              ║  Testing/Security:                  ║
+              ║  • L10: Test quality & depth?        ║
+              ║  • L11: Permission checks?          ║
+              ║  • L12: Resource management?        ║
               ╚═══════════════╤══════════════════╝
                               │
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -303,20 +314,20 @@ The approach splits at the **cost/accuracy boundary**:
 
 ## 🏁 Hackathon Scope
 
-> 💡 **This is a proposal idea. No technical work has been started yet.** The hackathon goal is to validate the concept, build a working prototype, and demonstrate it on a real SW360 PR.
+> 💡 **Prototype implemented and tested.** The agent has been validated against real SW360 PRs (#4223, #4168) using Siemens deepseek-v4-flash model.
 
 ![Hackathon Scope](diagrams/hackathon_scope.svg)
 
-**What this proposal asks for (Hackathon):**
+**Hackathon milestones:**
 
 | # | Goal | Status |
 |---|---|---|
-| 1 | Build Layer 1 deterministic rules (R01–R08) on PR diffs | 🔲 Not started |
-| 2 | Index the SW360 codebase into vector store (patterns, rules, conventions) | 🔲 Not started |
-| 3 | Build Layer 2 RAG-powered checks (L01–L06) | 🔲 Not started |
-| 4 | Build the GitHub review poster (inline comments with suggestions) | 🔲 Not started |
+| 1 | Build Layer 1 deterministic rules (R01–R06, complementing ArchUnit) | ✅ Done |
+| 2 | Index the SW360 codebase into vector store (738 patterns indexed) | ✅ Done |
+| 3 | Build Layer 2 RAG-powered checks (L01–L12, file-type-specific) | ✅ Done |
+| 4 | Build the GitHub review poster (inline comments with suggestions) | ✅ Done |
 | 5 | Wire up as GitHub App webhook (auto-trigger on PR push) | 🔲 Not started |
-| 6 | Demo: run on a real SW360 PR and compare against human review | 🔲 Not started |
+| 6 | Demo: run on real SW360 PRs and compare against human review | ✅ Done (PR #4223, #4168) |
 
 **What is explicitly NOT in scope for the hackathon:**
 - ❌ Production deployment or blocking PRs (`REQUEST_CHANGES`)
