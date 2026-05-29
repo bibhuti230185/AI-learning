@@ -1,0 +1,77 @@
+# Configuration
+# Copy this file to config.yaml and fill in your values
+
+# Model provider configuration
+# Supported: "anthropic", "openai", "custom"
+# "custom" allows plugging in any model via HTTP endpoint (e.g., Siemens-trained models)
+model:
+  provider: "anthropic"
+  model_name: "claude-sonnet-4-20250514"
+  # For custom provider, specify base_url
+  # base_url: "https://your-model-endpoint.siemens.cloud/v1"
+  temperature: 0.1
+  max_tokens: 4096
+
+# GitHub configuration
+github:
+  # Token with repo + pull_request permissions
+  token: "${GITHUB_TOKEN}"
+  # Webhook secret for verifying payloads
+  webhook_secret: "${GITHUB_WEBHOOK_SECRET}"
+  # Repository to review (owner/repo format)
+  repository: "eclipse-sw360/sw360"
+
+# Layer 1: Deterministic rules (complements ArchUnit — no overlap)
+layer1:
+  enabled: true
+  rules:
+    - R01  # Commits have Signed-off-by (DCO)
+    - R02  # Thrift return values null-checked
+    - R03  # No hardcoded credentials
+    - R04  # Unbounded collection fetch (missing pagination)
+    - R05  # New Thrift fields need migration script
+    - R06  # No catch(Exception) — use specific types
+
+# Layer 2: RAG + LLM review (expert-level contextual checks)
+layer2:
+  enabled: true
+  checks:
+    - L01  # API backward compatibility
+    - L02  # JacksonCustomizations dual registration
+    - L03  # HATEOAS & HAL response format
+    - L04  # Thrift null-safety
+    - L05  # Exception handling chain
+    - L06  # Cross-file consistency
+    - L07  # CouchDB query efficiency (N+1)
+    - L08  # Pagination correctness
+    - L09  # CouchDB view design
+    - L10  # Test quality & coverage depth
+    - L11  # Document-level permission checks
+    - L12  # Resource management
+  vector_store:
+    provider: "chromadb"
+    # For remote ChromaDB
+    # host: "localhost"
+    # port: 8000
+    collection_name: "sw360_codebase"
+    embedding_model: "all-MiniLM-L6-v2"
+
+# Review posting
+review:
+  # "COMMENT" or "REQUEST_CHANGES" (when errors found)
+  default_verdict: "COMMENT"
+  # Enable REQUEST_CHANGES when confidence is high
+  block_on_errors: false
+  max_comments: 50
+  # Minimum confidence to post a finding (0.0 - 1.0)
+  min_confidence: 0.7
+
+# Server configuration (webhook receiver)
+server:
+  host: "0.0.0.0"
+  port: 8090
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"
