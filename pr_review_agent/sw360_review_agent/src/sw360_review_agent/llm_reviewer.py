@@ -9,15 +9,12 @@
 
 """Layer 2 — RAG-powered LLM review for expert-level contextual code analysis.
 
-This layer handles checks that require deep SW360 domain knowledge,
+This layer handles checks that require deep domain knowledge,
 cross-file context, and understanding of architectural patterns that
-ArchUnit (78 tests) and CI pipelines cannot cover.
+automated linters and CI pipelines cannot cover.
 
-Rule categories:
-  L01–L03: REST API layer (backward compat, Jackson mixin, HATEOAS)
-  L04–L06: Service & Thrift layer (null-safety, exception handling, cross-file)
-  L07–L09: Database layer (query efficiency, pagination, migration)
-  L10–L12: Testing & security (test quality, permissions, resource mgmt)
+Rules and prompts are loaded from project_rules/ for full configurability.
+Any project can customize the LLM reviewer behavior without modifying Python code.
 """
 
 from __future__ import annotations
@@ -34,6 +31,7 @@ from sw360_review_agent.models import (
     parse_json_response,
 )
 from sw360_review_agent.retriever import RetrievedChunk, VectorRetriever
+from sw360_review_agent.rules_loader import ProjectRules
 from sw360_review_agent.schemas import (
     ChangedFile,
     FileClassification,
@@ -44,26 +42,12 @@ from sw360_review_agent.schemas import (
 logger = structlog.get_logger(__name__)
 
 # ---------------------------------------------------------------------------
-# System prompt — deep SW360 expertise baked in
+# Fallback system prompt (used when no project_rules/review_prompt.md exists)
 # ---------------------------------------------------------------------------
 
-REVIEW_SYSTEM_PROMPT = """\
-You are an expert SW360 code reviewer with deep knowledge of the Eclipse SW360 \
-architecture, conventions, and common pitfalls. You review PR diffs for issues \
-that automated tools (ArchUnit, Spotless, CI) CANNOT catch.
-
-## SW360 Architecture (you MUST understand this)
-```
-REST Controllers → Sw360*Service → ThriftClients → Backend *Handler → *Repository → CouchDB
-                                                     ↑
-                                            Thrift .thrift files define the interface
-```
-- **Controllers**: @RestController, HATEOAS (EntityModel/CollectionModel), HAL links
-- **Services** (Sw360*Service): Bridge REST ↔ Thrift. Must null-check every Thrift return.
-- **ThriftClients**: makeComponentClient(), makeProjectClient(), etc.
-- **Handlers** (*Handler, *DatabaseHandler): Business logic + CouchDB access via repositories
-- **Repositories**: Extend DatabaseRepositoryCloudantClient<T>, use CouchDB views/selectors
-- **DTOs**: Thrift-generated objects (not POJOs). Serialized via JacksonCustomizations mixins.
+_FALLBACK_SYSTEM_PROMPT = """\
+You are an expert code reviewer. You review PR diffs for issues \
+that automated tools (linters, CI) CANNOT catch.
 
 ## Response Format
 Return ONLY a JSON array. Each finding:
@@ -72,7 +56,7 @@ Return ONLY a JSON array. Each finding:
   {
     "line": <int>,
     "severity": "error" | "warning" | "suggestion",
-    "rule": "SW360-L01" to "SW360-L12",
+    "rule": "<rule-id>",
     "message": "<clear, specific description>",
     "suggestion": "<concrete code fix>",
     "reference": "<file or class where the correct pattern exists>"
@@ -81,159 +65,99 @@ Return ONLY a JSON array. Each finding:
 ```
 If no issues found, return: []
 
-## Rules You Enforce
-
-### REST API Layer
-- **L01 — API backward compatibility**: Detect breaking REST API changes: \
-field removal from responses, field type changes, endpoint path/method changes, \
-renamed query parameters. These break existing clients.
-- **L02 — JacksonCustomizations dual registration**: When new Thrift types are exposed \
-via REST, the mixin must be registered TWICE in JacksonCustomizations.java: \
-(1) setMixInAnnotation() for runtime serialization AND \
-(2) SpringDocUtils.getConfig().replaceWithClass() for OpenAPI schema. \
-Missing either causes silent bugs.
-- **L03 — HATEOAS & HAL response format**: Controllers must return \
-EntityModel<T> / CollectionModel<T>, not raw objects. Links must be added via \
-restControllerHelper. Pagination must use PaginationResult.
-
-### Service & Thrift Layer
-- **L04 — Thrift null-safety**: Every Thrift client call can return null. \
-The caller MUST check for null before using the result. \
-Common anti-pattern: `client.getXById(id, user).getName()` → NPE. \
-Correct: assign to variable → null-check → throw ResourceNotFoundException if null.
-- **L05 — Exception handling chain**: SW360Exception must be caught and mapped: \
-errorCode 404 → ResourceNotFoundException, 403 → AccessDeniedException, \
-409 → DataIntegrityViolationException. Never expose raw TException or stack traces.
-- **L06 — Cross-file consistency**: Verify these change-pairs are complete: \
-Thrift .thrift change → Handler updated → Service updated → Test updated. \
-New Controller endpoint → matching test with actual HTTP call. \
-New REST field → JacksonCustomizations mixin updated.
-
-### Database & CouchDB Layer
-- **L07 — CouchDB query efficiency**: Detect N+1 query patterns (loop + single doc fetch). \
-Prefer bulk operations (executeBulk, getAll with keys). \
-New selector queries should have a matching createIndex or createPartialTypeIndex.
-- **L08 — Pagination correctness**: DB-side pagination must use PaginationData consistently. \
-Set totalRowCount. Don't load all docs and then paginate in-memory (defeats the purpose). \
-Repository methods returning List<T> for large collections must accept PaginationData.
-- **L09 — CouchDB view design**: Map functions must filter by type. \
-Views emitting too many fields waste memory. \
-Reduce functions should use built-ins (_count, _sum) when possible.
-
-### Testing & Security
-- **L10 — Test quality & coverage depth**: Tests must make REAL HTTP calls \
-(TestRestTemplate.exchange(), MockMvc.perform()). Tests with only \
-assertTrue(true) or no assertions are worthless. Integration tests must verify \
-response status, body content, and error cases. Test both happy path and error paths.
-- **L11 — Document-level permission checks**: Write operations on documents \
-(update, delete) must check permissions via makePermission(doc, user).isActionAllowed(). \
-Role checks via isUserAtLeast() for admin operations. \
-Visibility enforcement: PRIVATE, ME_AND_MODERATORS, BUISNESSUNIT_AND_MODERATORS, EVERYONE.
-- **L12 — Resource management**: Thrift transport must be closed after use. \
-Streams must use try-with-resources. No Thread creation in controllers/services \
-(use managed executors). No mutable static state.
-
 ## Critical Constraints
 - ONLY report findings you are ≥80% confident about.
 - EVERY finding must cite a specific line number from the diff.
-- NEVER flag issues already caught by ArchUnit (System.out, @Autowired fields, \
-@Operation missing, naming conventions, banned imports, etc.).
+- NEVER flag issues that automated linters/CI already catch.
 - Provide ACTIONABLE suggestions with actual code, not vague advice.
-- When referencing a pattern, cite the actual SW360 class where it's done correctly.
 """
 
+_FALLBACK_FOCUS = """\
+## Review Focus: General Source File
+Review this file for:
+1. Null-safety on external or service calls
+2. Proper exception handling (no swallowing, proper mapping)
+3. Efficient data access patterns (no N+1 queries)
+4. Proper resource management (streams closed, no leaks)
+"""
+
+
+def _build_system_prompt(project_rules: ProjectRules | None) -> str:
+    """Build the system prompt from project rules or use fallback."""
+    if project_rules and project_rules.review_prompt:
+        prompt = project_rules.review_prompt
+
+        # Append rules section if review rules are defined
+        if project_rules.review_rules:
+            rules_section = "\n\n## Rules You Enforce\n"
+            for rule in project_rules.review_rules:
+                rules_section += f"\n- **{rule.id} — {rule.name}**: {rule.description}"
+            prompt += rules_section
+
+        return prompt
+
+    return _FALLBACK_SYSTEM_PROMPT
+
+
+def _get_focus_prompt(
+    file_type: str,
+    project_rules: ProjectRules | None,
+) -> str:
+    """Get file-type-specific focus prompt from config or fallback."""
+    if project_rules and project_rules.review_focus:
+        focus = project_rules.review_focus.get(file_type)
+        if focus:
+            return focus
+        # Try "default" key
+        return project_rules.review_focus.get("default", _FALLBACK_FOCUS)
+
+    # Legacy: try the hardcoded dict (kept for backward compat)
+    return _FILE_TYPE_FOCUS.get(
+        FileClassification(file_type) if file_type in FileClassification.__members__.values() else FileClassification.OTHER,
+        _FALLBACK_FOCUS,
+    )
+
+
 # ---------------------------------------------------------------------------
-# File-type-specific review focus prompts
+# Legacy file-type-specific review focus prompts (backward compat)
+# These are used ONLY when no project_rules/review_focus.yaml is configured.
 # ---------------------------------------------------------------------------
 
 _FILE_TYPE_FOCUS: dict[FileClassification, str] = {
-    FileClassification.CONTROLLER: """\
-## Review Focus: REST Controller
-You are reviewing a **REST Controller**. Focus on:
-1. **L01**: Are any existing response fields removed or renamed? (breaking change)
-2. **L02**: If this controller returns new Thrift types, does JacksonCustomizations need updating?
-3. **L03**: Does the response use EntityModel<T> / CollectionModel<T>? Are HAL links added?
-4. **L06**: Is there a matching test class with actual HTTP calls for new/changed endpoints?
-5. **L11**: Do write endpoints check document-level permissions?
-
-DO NOT check: @Operation, @PreAuthorize, @SecurityRequirement, @RestController \
-(ArchUnit already enforces these).
-""",
-    FileClassification.SERVICE: """\
-## Review Focus: Service (Sw360*Service)
-You are reviewing a **REST Service class**. Focus on:
-1. **L04**: Is EVERY Thrift client return value null-checked before use?
-2. **L05**: Are SW360Exception error codes mapped to proper HTTP exceptions?
-3. **L06**: If a new Thrift method is called, is the Handler implementation present?
-4. **L12**: Are Thrift clients obtained and used safely?
-
-Pattern to verify:
-```java
-ComponentService.Iface client = thriftClients.makeComponentClient();
-Component comp = client.getComponentById(id, user);
-if (comp == null) {
-    throw new ResourceNotFoundException("Component not found: " + id);
+    FileClassification.CONTROLLER: (
+        "## Review Focus: REST Controller\n"
+        "Focus on: API backward compatibility, serialization config, "
+        "response format conventions, matching tests, permission checks."
+    ),
+    FileClassification.SERVICE: (
+        "## Review Focus: Service Layer\n"
+        "Focus on: null-safety on external calls, exception mapping, "
+        "cross-file consistency, resource management."
+    ),
+    FileClassification.HANDLER: (
+        "## Review Focus: Backend Handler\n"
+        "Focus on: N+1 query patterns, pagination, query efficiency, "
+        "permission checks, exception handling."
+    ),
+    FileClassification.TEST: (
+        "## Review Focus: Test Class\n"
+        "Focus on: real HTTP/integration calls, meaningful assertions, "
+        "error case coverage, naming conventions."
+    ),
+    FileClassification.THRIFT: (
+        "## Review Focus: Interface Definition\n"
+        "Focus on: field number sequencing, optional vs required, "
+        "backward compatibility, matching implementations."
+    ),
 }
-```
-""",
-    FileClassification.HANDLER: """\
-## Review Focus: Backend Handler
-You are reviewing a **Backend Handler**. Focus on:
-1. **L07**: Are there N+1 query patterns? (looping with single-doc fetches)
-2. **L08**: Do methods returning collections use PaginationData when appropriate?
-3. **L09**: If new CouchDB views are defined, do map functions filter by type?
-4. **L11**: Are permission checks applied before write/delete operations?
-5. **L05**: Are exceptions wrapped in SW360Exception with proper error codes?
-
-Anti-pattern to catch:
-```java
-// BAD: N+1 query
-for (String id : releaseIds) {
-    Release r = repository.get(id);  // One query per iteration!
-    results.add(r);
-}
-// GOOD: Bulk fetch
-List<Release> results = repository.get(releaseIds);
-```
-""",
-    FileClassification.TEST: """\
-## Review Focus: Test Class
-You are reviewing a **Test class**. Focus on:
-1. **L10**: Do @Test methods actually make HTTP calls (TestRestTemplate/MockMvc)?
-2. **L10**: Are there real assertions on response status, body, and fields?
-3. **L10**: Are error cases tested (404, 403, 400)?
-4. **L06**: Does the test naming follow existing patterns?
-
-Worthless test pattern to flag:
-```java
-@Test
-void testSomething() {
-    assertTrue(true);  // Does nothing — ArchUnit will count this but it's useless
-}
-```
-""",
-    FileClassification.THRIFT: """\
-## Review Focus: Thrift Definition
-You are reviewing a **Thrift .thrift file**. Focus on:
-1. **L06**: Are field numbers sequential? No gaps or reused numbers from deleted fields?
-2. **L06**: Are new fields marked optional (required fields break backward compat)?
-3. **L09**: Does a new service method need a corresponding Handler implementation?
-4. **L01**: Could removing/renaming a field break existing REST responses?
-""",
-}
-
-_DEFAULT_FOCUS = """\
-## Review Focus: General Java File
-Review this file for:
-1. **L04**: Null-safety on any Thrift or external service calls
-2. **L05**: Proper exception handling (no swallowing, proper mapping)
-3. **L07**: Efficient data access patterns (no N+1 queries)
-4. **L12**: Proper resource management (streams closed, no leaks)
-"""
 
 
 class LLMReviewer:
-    """Layer 2 reviewer that uses RAG + LLM for contextual code analysis."""
+    """Layer 2 reviewer that uses RAG + LLM for contextual code analysis.
+
+    Supports config-driven prompts loaded from project_rules/ or falls back
+    to built-in prompts for backward compatibility.
+    """
 
     def __init__(
         self,
@@ -241,28 +165,24 @@ class LLMReviewer:
         layer2_config: Layer2Config,
         retriever: VectorRetriever,
         llm_provider: LLMProvider | None = None,
+        project_rules: ProjectRules | None = None,
     ) -> None:
         self._config = layer2_config
         self._retriever = retriever
         self._provider = llm_provider or create_provider(model_config)
         self._enabled_checks = set(layer2_config.checks)
+        self._project_rules = project_rules
+        self._system_prompt = _build_system_prompt(project_rules)
 
     async def review_file(self, file: ChangedFile) -> list[ReviewComment]:
-        """Run Layer 2 review on a single file.
-
-        Steps 4-7 from the workflow:
-        4. Retrieve applicable rules (RAG)
-        5. Retrieve reference implementation (RAG)
-        6. Retrieve cross-file context (RAG)
-        7. LLM analysis
-        """
-        if file.classification == FileClassification.OTHER:
+        """Run Layer 2 review on a single file."""
+        if file.classification == FileClassification.OTHER and file.file_type == "other":
             return []
         if not file.added_lines:
             return []
 
         entity = _extract_entity(file.path)
-        file_type = file.classification.value
+        file_type = file.file_type
 
         # Step 4: Retrieve rules
         rules_chunks = await self._retriever.retrieve_rules(file_type)
@@ -341,11 +261,11 @@ class LLMReviewer:
             rules=rules,
             reference=reference,
             cross_file=cross_file,
-            file_classification=file.classification,
+            file_type=file.file_type,
         )
 
         messages = [
-            LLMMessage(role="system", content=REVIEW_SYSTEM_PROMPT),
+            LLMMessage(role="system", content=self._system_prompt),
             LLMMessage(role="user", content=user_prompt),
         ]
 
@@ -400,11 +320,11 @@ class LLMReviewer:
         rules: list[RetrievedChunk],
         reference: list[RetrievedChunk],
         cross_file: list[RetrievedChunk],
-        file_classification: FileClassification = FileClassification.JAVA,
+        file_type: str = "java",
     ) -> str:
         """Build the complete user prompt for LLM analysis."""
         # File-type-specific focus instructions
-        focus = _FILE_TYPE_FOCUS.get(file_classification, _DEFAULT_FOCUS)
+        focus = _get_focus_prompt(file_type, self._project_rules)
 
         sections = [
             focus,

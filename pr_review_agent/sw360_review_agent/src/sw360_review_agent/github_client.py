@@ -37,8 +37,9 @@ GITHUB_API = "https://api.github.com"
 class GitHubClient:
     """Client for GitHub PR operations."""
 
-    def __init__(self, config: GitHubConfig) -> None:
+    def __init__(self, config: GitHubConfig, project_rules=None) -> None:
         self._config = config
+        self._project_rules = project_rules
         self._client = httpx.AsyncClient(
             base_url=GITHUB_API,
             headers={
@@ -122,7 +123,11 @@ class GitHubClient:
                     deletions=f.get("deletions", 0),
                     patch=f.get("patch", ""),
                 )
-                changed_file.classification = classify_file(changed_file.path)
+                classification, file_type = classify_file(
+                    changed_file.path, self._project_rules
+                )
+                changed_file.classification = classification
+                changed_file.file_type = file_type
                 changed_file.added_lines = _extract_added_lines(changed_file.patch)
                 files.append(changed_file)
 
@@ -219,12 +224,38 @@ _CLASSIFICATION_PATTERNS: list[tuple[str, FileClassification]] = [
 ]
 
 
-def classify_file(path: str) -> FileClassification:
-    """Classify a file based on its path/name pattern."""
+# Enum value lookup for mapping type strings to FileClassification
+_CLASSIFICATION_MAP: dict[str, FileClassification] = {
+    member.value: member for member in FileClassification
+}
+
+
+def classify_file(path: str, project_rules=None) -> tuple[FileClassification, str]:
+    """Classify a file based on its path/name pattern.
+
+    Args:
+        path: File path to classify.
+        project_rules: Optional ProjectRules instance with configurable patterns.
+
+    Returns:
+        Tuple of (FileClassification enum, file_type string).
+        The file_type string is from config (may not match enum values for custom types).
+    """
+    # Config-driven classification (preferred)
+    if project_rules and project_rules.file_types:
+        for file_type_pattern in project_rules.file_types:
+            if file_type_pattern.pattern.match(path):
+                type_name = file_type_pattern.type_name
+                # Map to enum if possible, otherwise use OTHER
+                classification = _CLASSIFICATION_MAP.get(type_name, FileClassification.OTHER)
+                return classification, type_name
+        return FileClassification.OTHER, "other"
+
+    # Legacy fallback: hardcoded patterns
     for pattern, classification in _CLASSIFICATION_PATTERNS:
         if re.match(pattern, path):
-            return classification
-    return FileClassification.OTHER
+            return classification, classification.value
+    return FileClassification.OTHER, "other"
 
 
 # ---------------------------------------------------------------------------

@@ -21,6 +21,7 @@ from sw360_review_agent.lint_rules import DeterministicLinter
 from sw360_review_agent.llm_reviewer import LLMReviewer
 from sw360_review_agent.models import create_provider
 from sw360_review_agent.retriever import VectorRetriever
+from sw360_review_agent.rules_loader import ProjectRules, load_project_rules
 from sw360_review_agent.schemas import (
     FileClassification,
     PRContext,
@@ -42,11 +43,19 @@ class PRReviewAgent:
     4. Merge, deduplicate, and post review
     """
 
-    def __init__(self, config: AgentConfig) -> None:
+    def __init__(self, config: AgentConfig, project_rules: ProjectRules | None = None) -> None:
         self._config = config
-        self._github = GitHubClient(config.github)
+
+        # Load project rules from config directory or default
+        if project_rules is None:
+            self._project_rules = load_project_rules(config.project_rules_dir)
+        else:
+            self._project_rules = project_rules
+
+        self._github = GitHubClient(config.github, project_rules=self._project_rules)
         self._linter = DeterministicLinter(
-            enabled_rules=config.layer1.rules if config.layer1.enabled else []
+            enabled_rules=config.layer1.rules if config.layer1.enabled else [],
+            project_rules=self._project_rules,
         )
         self._retriever = VectorRetriever(config.layer2.vector_store)
 
@@ -57,6 +66,7 @@ class PRReviewAgent:
             layer2_config=config.layer2,
             retriever=self._retriever,
             llm_provider=self._llm_provider,
+            project_rules=self._project_rules,
         )
 
     async def initialize(self) -> None:
@@ -90,41 +100,41 @@ class PRReviewAgent:
         # Step 0-2: Fetch PR context and classify files
         pr_context = await self._github.get_pr_context(owner, repo, pr_number)
 
-        # Filter to Java files only
-        java_files = [
+        # Filter to relevant files only (skip "other" type)
+        relevant_files = [
             f for f in pr_context.changed_files
-            if f.classification != FileClassification.OTHER
+            if f.file_type != "other"
         ]
 
-        if not java_files:
-            logger.info("no_java_files_skipping", pr=pr_number)
+        if not relevant_files:
+            logger.info("no_relevant_files_skipping", pr=pr_number)
             return ReviewResult(
                 pr_context=pr_context,
                 verdict="COMMENT",
-                summary="No Java files changed — skipping review.",
+                summary="No relevant files changed — skipping review.",
             )
 
         logger.info(
             "files_classified",
             total=len(pr_context.changed_files),
-            java=len(java_files),
+            relevant=len(relevant_files),
         )
 
         # Step 3: Layer 1 — Deterministic checks
         layer1_findings: list[ReviewComment] = []
         if self._config.layer1.enabled:
             layer1_findings = self._linter.check_all(
-                java_files, pr_context.commit_messages
+                relevant_files, pr_context.commit_messages
             )
             logger.info("layer1_done", findings=len(layer1_findings))
 
         # Steps 4-7: Layer 2 — RAG + LLM (skip if >100 files for performance)
         layer2_findings: list[ReviewComment] = []
-        if self._config.layer2.enabled and len(java_files) <= 100:
-            layer2_findings = await self._llm_reviewer.review_all(java_files)
+        if self._config.layer2.enabled and len(relevant_files) <= 100:
+            layer2_findings = await self._llm_reviewer.review_all(relevant_files)
             logger.info("layer2_done", findings=len(layer2_findings))
-        elif len(java_files) > 100:
-            logger.info("layer2_skipped_too_many_files", count=len(java_files))
+        elif len(relevant_files) > 100:
+            logger.info("layer2_skipped_too_many_files", count=len(relevant_files))
 
         # Step 8: Merge and deduplicate
         all_findings = _deduplicate_and_prioritize(

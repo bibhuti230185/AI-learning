@@ -1,0 +1,60 @@
+# File Type Classification Rules
+# ================================
+# Maps file path patterns (regex) to type names.
+# The agent uses these types to decide which rules and review focus to apply.
+#
+# Format:
+#   - pattern: <regex matching the file path>
+#     type: <type name string>
+#
+# Patterns are evaluated top-to-bottom; first match wins.
+# Type names are free-form strings that must match keys in review_focus.yaml
+# and applies_to fields in lint_rules.yaml.
+#
+# Built-in fallback: files not matching any pattern get type "other" and are skipped.
+
+patterns:
+  - pattern: ".*Controller\\.java$"
+    type: controller
+
+  - pattern: ".*Service\\.java$"
+    type: service
+
+  - pattern: ".*(Test|SpecTest)\\.java$"
+    type: test
+
+  - pattern: ".*\\.thrift$"
+    type: thrift
+
+  - pattern: ".*(DatabaseHandler|Handler)\\.java$"
+    type: handler
+
+  - pattern: ".*JacksonCustomizations\\.java$"
+    type: jackson_mixin
+
+  - pattern: ".*\\.java$"
+    type: java
+
+# Examples for other projects:
+# ----------------------------
+# Python project:
+#   - pattern: ".*_test\\.py$"
+#     type: test
+#   - pattern: ".*/views\\.py$"
+#     type: controller
+#   - pattern: ".*/models\\.py$"
+#     type: model
+#   - pattern: ".*\\.py$"
+#     type: python
+#
+# TypeScript/React project:
+#   - pattern: ".*\\.spec\\.ts$"
+#     type: test
+#   - pattern: ".*\\.controller\\.ts$"
+#     type: controller
+#   - pattern: ".*\\.service\\.ts$"
+#     type: service
+#   - pattern: ".*\\.tsx$"
+#     type: component
+#   - pattern: ".*\\.ts$"
+#     type: typescript

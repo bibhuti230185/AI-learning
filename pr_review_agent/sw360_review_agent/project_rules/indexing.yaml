@@ -1,0 +1,54 @@
+# RAG Indexing Configuration
+# ===========================
+# Controls what gets indexed into the vector store for reference retrieval.
+#
+# Instead of indexing the full codebase, you can:
+# 1. Specify directories to scan (with patterns)
+# 2. Drop specific reference files into a references/ folder
+#
+# The agent uses indexed content to provide context to the LLM reviewer.
+
+# Project name (used in queries and metadata)
+project_name: "sw360"
+
+# Directories to scan for indexing
+# Only files matching include_patterns within these directories are indexed.
+scan_dirs:
+  - path: "rest/resource-server/src"
+    include_patterns: ["**/*Controller.java", "**/*Service.java"]
+  - path: "backend"
+    include_patterns: ["**/*Handler.java"]
+
+# File type matchers for the indexer
+# Maps a type label to a filename matcher (glob or suffix)
+file_matchers:
+  controller:
+    suffix: "Controller.java"
+    exclude_suffix: "Test.java"
+  service:
+    suffix: "Service.java"
+    exclude_suffix: "Test.java"
+  handler:
+    suffix: "Handler.java"
+  test:
+    suffix: "Test.java"
+
+# Directories/patterns to always skip
+exclude_patterns:
+  - "target"
+  - ".git"
+  - "node_modules"
+  - "__pycache__"
+  - ".class"
+
+# Maximum characters per indexed document (longer files are truncated)
+max_doc_length: 1500
+
+# What to extract from each file for indexing
+# Options: "signatures" (method signatures + annotations), "full" (entire file)
+extraction_mode: "signatures"
+
+# References directory (optional)
+# Drop specific files here that you want always available as RAG context.
+# These are indexed as-is without filtering.
+references_dir: "project_rules/references"

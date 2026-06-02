@@ -44,7 +44,7 @@ class Layer1Config(BaseModel):
 
     enabled: bool = True
     rules: list[str] = Field(
-        default_factory=lambda: ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08"]
+        default_factory=lambda: ["R01", "R02", "R03", "R04", "R05", "R06"]
     )
 
 
@@ -102,6 +102,7 @@ class AgentConfig(BaseSettings):
     review: ReviewConfig = Field(default_factory=ReviewConfig)
     server: ServerConfig = Field(default_factory=ServerConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    project_rules_dir: str | None = None  # Path to project_rules/ directory
 
 
 def _resolve_env_vars(data: Any) -> Any:

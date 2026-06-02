@@ -1,0 +1,140 @@
+# Review Focus — File-Type-Specific LLM Instructions
+# ====================================================
+# Each key is a file type (from file_types.yaml).
+# The value is a review focus prompt sent to the LLM along with the diff.
+#
+# These tell the LLM what to look for in each type of file.
+# Use {project_name} as a placeholder for the project name.
+#
+# Any file type not listed here gets the "default" focus.
+
+# ─── LLM Review Rules ──────────────────────────────────────────────────────
+# Define the expert rules the LLM should enforce. These are injected into
+# the system prompt. Each rule has an ID, name, and description.
+rules:
+  - id: L01
+    name: "API backward compatibility"
+    description: >
+      Detect breaking REST API changes: field removal from responses,
+      field type changes, endpoint path/method changes, renamed query parameters.
+      These break existing clients.
+
+  - id: L02
+    name: "Serialization consistency"
+    description: >
+      When new types are exposed via REST, ensure serialization config
+      (e.g., Jackson mixins, DTOs) is properly registered. Missing registration
+      causes silent bugs in responses.
+
+  - id: L03
+    name: "Response format compliance"
+    description: >
+      Controllers must follow project response conventions (e.g., HATEOAS, envelope,
+      pagination format). Raw objects should not be returned directly.
+
+  - id: L04
+    name: "External call null-safety"
+    description: >
+      Every external/remote service call can return null or fail.
+      Callers MUST null-check before using the result.
+      Anti-pattern: client.getX(id).getName() → NPE risk.
+
+  - id: L05
+    name: "Exception handling chain"
+    description: >
+      Exceptions from backend/external services must be caught and mapped
+      to appropriate HTTP responses. Never expose raw internal exceptions.
+
+  - id: L06
+    name: "Cross-file consistency"
+    description: >
+      Verify change-pairs are complete: interface change → implementation updated,
+      new endpoint → matching test, new field → serialization config updated.
+
+  - id: L07
+    name: "Query efficiency"
+    description: >
+      Detect N+1 query patterns (loop + single fetch). Prefer bulk operations.
+      New queries should have appropriate indexes.
+
+  - id: L08
+    name: "Pagination correctness"
+    description: >
+      Large collections must use pagination. Don't load all records and
+      paginate in-memory. Set total count properly.
+
+  - id: L09
+    name: "Data layer design"
+    description: >
+      Database views/queries should filter by type. Avoid emitting unnecessary
+      fields. Use built-in reduce functions when possible.
+
+  - id: L10
+    name: "Test quality"
+    description: >
+      Tests must make real calls (HTTP/integration). Tests with only
+      assertTrue(true) or no assertions are worthless. Test both happy and error paths.
+
+  - id: L11
+    name: "Permission checks"
+    description: >
+      Write operations must verify user permissions before modifying data.
+      Role checks for admin operations. Visibility enforcement.
+
+  - id: L12
+    name: "Resource management"
+    description: >
+      Connections/streams must be closed after use. No thread creation in
+      request handlers. No mutable static state.
+
+# ─── File-Type Focus ───────────────────────────────────────────────────────
+
+focus:
+  controller: |
+    ## Review Focus: Controller / API Endpoint
+    You are reviewing a **Controller**. Focus on:
+    1. **L01**: Are any existing response fields removed or renamed? (breaking change)
+    2. **L02**: If new types are returned, is serialization configured?
+    3. **L03**: Does the response follow project conventions (format, links, pagination)?
+    4. **L06**: Is there a matching test with actual HTTP calls for new/changed endpoints?
+    5. **L11**: Do write endpoints check permissions?
+
+  service: |
+    ## Review Focus: Service Layer
+    You are reviewing a **Service class**. Focus on:
+    1. **L04**: Is EVERY external/remote call return value null-checked before use?
+    2. **L05**: Are backend exceptions caught and mapped to proper HTTP exceptions?
+    3. **L06**: If a new backend method is called, is the implementation present?
+    4. **L12**: Are resources obtained and used safely (closed after use)?
+
+  handler: |
+    ## Review Focus: Backend / Handler
+    You are reviewing a **Backend Handler**. Focus on:
+    1. **L07**: Are there N+1 query patterns? (looping with single-item fetches)
+    2. **L08**: Do methods returning collections use pagination when appropriate?
+    3. **L09**: Are database queries efficient and properly indexed?
+    4. **L11**: Are permission checks applied before write/delete operations?
+    5. **L05**: Are exceptions wrapped with proper error codes?
+
+  test: |
+    ## Review Focus: Test Class
+    You are reviewing a **Test class**. Focus on:
+    1. **L10**: Do test methods actually exercise the code (real HTTP calls/invocations)?
+    2. **L10**: Are there real assertions on responses (status, body, fields)?
+    3. **L10**: Are error cases tested (not-found, forbidden, bad-request)?
+    4. **L06**: Does the test naming follow existing patterns?
+
+  thrift: |
+    ## Review Focus: Interface Definition
+    You are reviewing an **interface definition file**. Focus on:
+    1. **L06**: Are field numbers sequential? No reused numbers from deleted fields?
+    2. **L06**: Are new fields optional (required fields break backward compat)?
+    3. **L01**: Could removing/renaming a field break existing API responses?
+
+  default: |
+    ## Review Focus: General Source File
+    Review this file for:
+    1. **L04**: Null-safety on external or service calls
+    2. **L05**: Proper exception handling (no swallowing, proper mapping)
+    3. **L07**: Efficient data access patterns (no N+1 queries)
+    4. **L12**: Proper resource management (streams closed, no leaks)

@@ -142,8 +142,10 @@ def cmd_lint(args: argparse.Namespace) -> None:
         content=content,
         patch=content,
         added_lines=added_lines,
-        classification=classify_file(str(file_path)),
     )
+    classification, file_type = classify_file(str(file_path))
+    changed_file.classification = classification
+    changed_file.file_type = file_type
 
     linter = DeterministicLinter()
     findings = linter.check_file(changed_file)

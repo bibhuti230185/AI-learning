@@ -1,35 +1,37 @@
-# SW360 PR Review Agent
+# PR Review Agent
 
-> **Two-Layer Automated PR Review Agent** — catches mechanical pattern violations instantly so human reviewers can focus on logic.
+> **Project-Agnostic Two-Layer Automated PR Review Agent** — catches mechanical pattern violations instantly so human reviewers can focus on logic. Works with **any project** via configurable rules.
 
-## Architecture
+## How It Works
 
 ```mermaid
-graph TB
-    subgraph MAL["Model Abstraction Layer"]
-        A["Anthropic<br/>(Claude Opus 4.5/4.6)"]
-        B["OpenAI-Compatible<br/>(GPT-4o, Azure, vLLM, Ollama)"]
-        C["Custom HTTP<br/>(Siemens-trained models)"]
-        A --> I["LLMProvider Interface"]
-        B --> I
-        C --> I
+flowchart LR
+    subgraph Config["project_rules/"]
+        FT["file_types.yaml"]
+        LR["lint_rules.yaml"]
+        RP["review_prompt.md"]
+        RF["review_focus.yaml"]
+        IX["indexing.yaml"]
     end
 
-    subgraph AGENT["PR Review Agent"]
-        I --> L1["Layer 1: Deterministic Linter<br/>R01-R08 · regex/grep · &lt;10s · $0"]
-        L1 --> L2["Layer 2: RAG + LLM Review<br/>L01-L06 · contextual · 30-60s · ~$0.05/PR"]
-
-        subgraph RAG["RAG Components"]
-            VS["Vector Store"]
-            RR["Reference Retrieval"]
-            CF["Cross-file Context"]
-        end
-
-        L2 --> RAG
-        L2 --> MG["Merge + Deduplicate + Post GitHub Review"]
+    subgraph Pipeline["Agent Pipeline"]
+        direction TB
+        S1["1. Fetch PR diff from GitHub"]
+        S2["2. Classify files"]
+        S3["3. Layer 1: Regex rules - instant, $0"]
+        S4["4. Layer 2: RAG + LLM - ~$0.05/PR"]
+        S5["5. Merge + Post GitHub Review"]
+        S1 --> S2 --> S3 --> S4 --> S5
     end
 
-    L1 --> MG
+    subgraph Providers["LLM Providers - swappable"]
+        P1["Anthropic - Claude"]
+        P2["OpenAI / Azure / vLLM"]
+        P3["Custom HTTP endpoint"]
+    end
+
+    Config --> Pipeline
+    Providers --> S4
 ```
 
 ## Quick Start
@@ -70,155 +72,279 @@ sw360-review lint --file src/main/java/MyController.java
 sw360-review server
 ```
 
-## Model Configuration
-
-The agent is **model-agnostic** by design. Switch models by changing `config.yaml`:
-
-### Claude (Anthropic) — Default
-
-```yaml
-model:
-  provider: "anthropic"
-  model_name: "claude-sonnet-4-20250514"  # or claude-opus-4-20250514
-```
-
-### OpenAI / Azure
-
-```yaml
-model:
-  provider: "openai"
-  model_name: "gpt-4o"
-  # For Azure:
-  # base_url: "https://your-deployment.openai.azure.com/openai/deployments/gpt-4o/v1"
-  # api_key: "your-azure-key"
-```
-
-### Siemens-Trained Models (or any custom endpoint)
-
-```yaml
-model:
-  provider: "openai"  # If your model exposes OpenAI-compatible API
-  model_name: "siemens-codellm-v2"
-  base_url: "https://your-internal-model.siemens.cloud/v1"
-  api_key: "your-internal-key"
-```
-
-Or for fully custom endpoint formats:
-
-```yaml
-model:
-  provider: "custom"
-  model_name: "siemens-codellm-v2"
-  base_url: "https://your-internal-model.siemens.cloud"
-  api_key: "your-internal-key"
-```
-
-### Adding a New Provider Programmatically
-
-```python
-from sw360_review_agent.models import LLMProvider, LLMMessage, LLMResponse, register_provider
-
-class SiemensLLMProvider(LLMProvider):
-    async def generate(self, messages, **kwargs) -> LLMResponse:
-        # Your custom implementation
-        ...
-
-    async def close(self):
-        ...
-
-# Register before creating the agent
-register_provider("siemens_llm", SiemensLLMProvider)
-```
-
-Then in config:
-```yaml
-model:
-  provider: "siemens_llm"
-  model_name: "your-model"
-```
+---
 
 ## Layer 1 Rules (Deterministic)
 
-These rules **complement** ArchUnit (78 tests) and CI — they catch what those tools miss.
+Layer 1 rules are **regex-based checks** that run instantly with zero cost. They catch common violations that automated CI tools miss.
 
-| Rule | Check | Severity |
-|------|-------|----------|
-| R01 | Commits have Signed-off-by (DCO/ECA) | error |
-| R02 | Thrift client return values null-checked | warning |
-| R03 | No hardcoded credentials/secrets | error |
-| R04 | Unbounded collection fetch (missing pagination) | warning |
-| R05 | New Thrift fields need CouchDB migration script | warning |
-| R06 | No `catch(Exception)` — use specific types | warning |
+### Where to configure
 
-> **Note:** License headers, System.out, @Autowired, @PreAuthorize, @Operation, and LoggerFactory
-> are already enforced by ArchUnit and CI. We don't duplicate those checks.
+```
+project_rules/lint_rules.yaml
+```
+
+### How it works
+
+Each rule defines:
+- **id** — unique identifier (used in `config.yaml` to enable/disable)
+- **type** — `commit` (checks commit messages) or `file` (checks source lines)
+- **patterns** — regex patterns that indicate a violation
+- **applies_to** — which file types this rule applies to (from `file_types.yaml`)
+- **exclude_paths** — skip files containing these path fragments
+
+### Enable/disable rules in `config.yaml`
+
+```yaml
+layer1:
+  enabled: true
+  rules: [R01, R02, R03, R06]   # only enable the rules you want
+```
+
+### Sample: Adding a custom rule
+
+To add a rule that catches `console.log` in TypeScript production code:
+
+```yaml
+# In project_rules/lint_rules.yaml
+rules:
+  - id: R10
+    name: "Console log in production"
+    type: file
+    severity: warning
+    patterns:
+      - regex: 'console\.(log|debug|info)\('
+        label: "console.log"
+    exclude_paths: [".spec.", ".test.", "__tests__"]
+    applies_to: [typescript, component]
+    message: "console.log found in production code."
+    suggestion: "Remove or replace with a proper logging service."
+```
+
+### Sample: Commit-level rule
+
+```yaml
+  - id: R01
+    name: "Signed-off-by (DCO)"
+    type: commit
+    severity: error
+    match_type: must_contain
+    pattern: "Signed-off-by:"
+    message: "Commit missing 'Signed-off-by:' line."
+    suggestion: "Use git commit -s to add it automatically."
+```
+
+### Rule type reference
+
+| Field | Values | Description |
+|-------|--------|-------------|
+| `type` | `commit`, `file` | What to check |
+| `severity` | `error`, `warning`, `suggestion` | How critical |
+| `match_type` | `must_contain`, `must_not_match` | For commit rules |
+| `applies_to` | list of file types | Scope (omit = all files) |
+| `exclude_paths` | list of strings | Skip paths containing these |
+| `only_modified` | `true`/`false` | Only check modified files (not new) |
+
+---
 
 ## Layer 2 Checks (AI-Powered)
 
-Expert-level contextual analysis using RAG + LLM. Each file gets a **file-type-specific** review
-(controller, service, handler, test, thrift) with tailored focus areas.
+Layer 2 uses an LLM with RAG context to perform **expert-level code review** — things regex cannot catch (architectural violations, cross-file consistency, logic errors).
 
-### REST API Layer
-| Check | What it verifies |
-|-------|-----------------|
-| L01 | API backward compatibility — no breaking field/endpoint changes |
-| L02 | JacksonCustomizations dual registration (ObjectMapper + SpringDoc) |
-| L03 | HATEOAS/HAL responses — EntityModel, links, pagination format |
+### Where to configure
 
-### Service & Thrift Layer
-| Check | What it verifies |
-|-------|-----------------|
-| L04 | Thrift return values null-checked before use |
-| L05 | Exception handling chain (SW360Exception → HTTP exceptions) |
-| L06 | Cross-file consistency (Thrift → Handler → Service → Test) |
+| File | Purpose |
+|------|---------|
+| `project_rules/review_prompt.md` | System prompt — describe your architecture here |
+| `project_rules/review_focus.yaml` | Per-file-type instructions + rule definitions |
 
-### Database & CouchDB Layer
-| Check | What it verifies |
-|-------|-----------------|
-| L07 | CouchDB query efficiency — N+1 patterns, missing indexes |
-| L08 | Pagination correctness — DB-side via PaginationData, not in-memory |
-| L09 | CouchDB view design — type filters, reduce functions |
+### How it works
 
-### Testing & Security
-| Check | What it verifies |
-|-------|-----------------|
-| L10 | Test quality — real HTTP calls, meaningful assertions, error cases |
-| L11 | Document-level permission checks — makePermission, isUserAtLeast |
-| L12 | Resource management — stream/transport cleanup, no static mutability |
+1. The agent loads your **system prompt** (`review_prompt.md`) which tells the LLM about your project architecture
+2. For each changed file, it loads the **focus prompt** matching the file type (from `review_focus.yaml`)
+3. RAG retrieves relevant reference patterns from the indexed codebase
+4. The LLM analyzes the diff against rules + context and returns findings as JSON
+
+### Enable/disable checks in `config.yaml`
+
+```yaml
+layer2:
+  enabled: true
+  checks: [L01, L04, L05, L06, L10]   # pick the checks relevant to your project
+```
+
+### Sample: Defining review rules (`review_focus.yaml`)
+
+```yaml
+# Define what the LLM should check
+rules:
+  - id: L01
+    name: "API backward compatibility"
+    description: >
+      Detect breaking REST API changes: field removal from responses,
+      type changes, endpoint path/method changes. These break clients.
+
+  - id: L04
+    name: "External call null-safety"
+    description: >
+      Every external service call can return null or fail.
+      Callers MUST null-check before using the result.
+
+# Define file-type-specific focus
+focus:
+  controller: |
+    ## Review Focus: Controller
+    You are reviewing an API Controller. Focus on:
+    1. L01: Are any response fields removed or renamed?
+    2. L06: Is there a matching test for new endpoints?
+    3. L11: Do write endpoints check permissions?
+
+  service: |
+    ## Review Focus: Service Layer
+    You are reviewing a Service class. Focus on:
+    1. L04: Is every external call null-checked?
+    2. L05: Are exceptions caught and mapped properly?
+```
+
+### Sample: Custom system prompt (`review_prompt.md`)
+
+```markdown
+You are an expert code reviewer for our Django REST API project.
+
+## Architecture
+Controllers (views.py) → Services → Repositories → PostgreSQL
+
+## Response Format
+Return ONLY a JSON array of findings.
+
+## Constraints
+- Only report issues you are 80%+ confident about
+- Every finding must cite a specific line number
+- Provide actionable fix suggestions
+```
+
+---
+
+## File Type Classification
+
+Controls how the agent identifies file types from paths.
+
+### Where to configure
+
+```
+project_rules/file_types.yaml
+```
+
+### Sample
+
+```yaml
+patterns:
+  - pattern: ".*Controller\\.java$"
+    type: controller
+
+  - pattern: ".*\\.spec\\.ts$"
+    type: test
+
+  - pattern: ".*\\.py$"
+    type: python
+```
+
+First match wins. Unmatched files get type `other` and are skipped.
+
+---
+
+## RAG Indexing
+
+Controls what codebase content is indexed into the vector store for reference retrieval.
+
+### Where to configure
+
+```
+project_rules/indexing.yaml
+```
+
+### Run the indexer
+
+```bash
+python scripts/index_codebase.py --repo-path /path/to/your/project --rules-dir ./project_rules
+```
+
+### Sample
+
+```yaml
+project_name: "my-project"
+scan_dirs:
+  - path: "src/controllers"
+    include_patterns: ["**/*Controller.java"]
+  - path: "src/services"
+    include_patterns: ["**/*Service.java"]
+file_matchers:
+  controller:
+    suffix: "Controller.java"
+    exclude_suffix: "Test.java"
+extraction_mode: "signatures"     # "signatures" or "full"
+max_doc_length: 1500
+references_dir: "project_rules/references"   # drop example files here
+```
+
+---
+
+## Model Configuration
+
+The agent is **model-agnostic**. Switch providers by editing `config.yaml`:
+
+```yaml
+# Anthropic (default)
+model:
+  provider: "anthropic"
+  model_name: "claude-sonnet-4-20250514"
+
+# OpenAI / Azure
+model:
+  provider: "openai"
+  model_name: "gpt-4o"
+
+# Any OpenAI-compatible endpoint (vLLM, Ollama, Siemens internal)
+model:
+  provider: "openai"
+  model_name: "your-model-name"
+  base_url: "https://your-endpoint.com/v1"
+  api_key: "your-key"
+```
+
+---
 
 ## Project Structure
 
-```mermaid
-graph LR
-    subgraph sw360_review_agent
-        PT["pyproject.toml"]
-        CF["config.example.yaml"]
-        DF["Dockerfile"]
-
-        subgraph src/sw360_review_agent
-            AGENT["agent.py — Orchestrator"]
-            CLI["cli.py — CLI entry point"]
-            CONFIG["config.py — Configuration"]
-            GH["github_client.py — GitHub API"]
-            LINT["lint_rules.py — Layer 1"]
-            LLM["llm_reviewer.py — Layer 2"]
-            MODELS["models.py — Provider abstraction"]
-            RET["retriever.py — Vector store RAG"]
-            SCH["schemas.py — Data models"]
-            SRV["server.py — FastAPI webhook"]
-        end
-
-        subgraph tests
-            T1["test_lint_rules.py"]
-            T2["test_models.py"]
-            T3["test_github_client.py"]
-        end
-
-        subgraph scripts
-            IDX["index_codebase.py"]
-        end
-    end
 ```
+sw360_review_agent/
+├── project_rules/              <-- All project-specific config lives here
+│   ├── file_types.yaml         File classification patterns
+│   ├── lint_rules.yaml         Layer 1 regex rules
+│   ├── review_prompt.md        Layer 2 system prompt
+│   ├── review_focus.yaml       Layer 2 rules + per-file-type focus
+│   ├── indexing.yaml           RAG indexing configuration
+│   └── references/             Drop reference files for RAG here
+├── src/sw360_review_agent/     Source code
+│   ├── agent.py                Orchestrator
+│   ├── config.py               Settings (pydantic)
+│   ├── github_client.py        GitHub API integration
+│   ├── lint_rules.py           Layer 1 engine
+│   ├── llm_reviewer.py         Layer 2 engine
+│   ├── models.py               LLM provider abstraction
+│   ├── retriever.py            ChromaDB RAG retriever
+│   ├── rules_loader.py         YAML/MD config loader
+│   ├── schemas.py              Data models
+│   └── server.py               FastAPI webhook server
+├── scripts/
+│   ├── index_codebase.py       Index project into ChromaDB
+│   └── test_config_rules.py    Smoke test for config rules
+├── tests/                      Unit tests
+├── config.example.yaml         Template configuration
+└── pyproject.toml              Package definition
+```
+
+---
 
 ## Development
 
@@ -236,43 +362,28 @@ mypy src/
 ruff check src/
 ```
 
-## How It Works
-
-```mermaid
-sequenceDiagram
-    participant GH as GitHub
-    participant WH as Webhook Server
-    participant AG as PRReviewAgent
-    participant L1 as Layer 1 (Linter)
-    participant VS as Vector Store
-    participant LLM as LLM Provider
-    participant API as GitHub API
-
-    GH->>WH: pull_request (opened/synchronize)
-    WH->>AG: trigger review
-    AG->>API: fetch PR diff + commits
-    API-->>AG: changed files + patches
-    AG->>AG: classify files
-
-    AG->>L1: run deterministic rules (R01-R08)
-    L1-->>AG: Layer 1 findings
-
-    AG->>VS: retrieve rules + references
-    VS-->>AG: RAG context
-    AG->>LLM: analyze diff with context
-    LLM-->>AG: Layer 2 findings
-
-    AG->>AG: merge + deduplicate
-    AG->>API: post review with inline comments
-    API-->>GH: review visible on PR
-```
+---
 
 ## Design Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| **Provider abstraction** | Swap Claude/GPT/Siemens models with config change only |
-| **Two-layer split** | Layer 1 is free+instant; Layer 2 only for what regex can't catch |
-| **Sequential pipeline** | LLM is called once per file, not in a loop — predictable costs |
-| **Graceful degradation** | If Layer 2 fails, Layer 1 still posts results |
-| **50-comment cap** | GitHub API limit; errors prioritized over warnings |
+| **Project-agnostic** | Works with any project via `project_rules/` — no code changes |
+| **Provider abstraction** | Swap Claude/GPT/custom models with config change only |
+| **Two-layer split** | Layer 1 is free and instant; Layer 2 only for what regex can't catch |
+| **Config-driven rules** | YAML/Markdown — non-programmers can add or modify rules |
+| **Sequential pipeline** | LLM called once per file — predictable costs |
+| **Graceful degradation** | If Layer 2 fails, Layer 1 results still get posted |
+| **50-comment cap** | GitHub API limit; errors are prioritized over warnings |
+
+---
+
+## Adapting for Your Project
+
+1. Copy `project_rules/` into your project
+2. Edit each YAML file to match your conventions (see sections above)
+3. Set `project_rules_dir` in `config.yaml` to point to your rules directory
+4. Run `scripts/index_codebase.py` to build the RAG index
+5. Start reviewing PRs
+
+Each config file includes inline comments and examples for Python, TypeScript, and Go projects.

@@ -62,6 +62,7 @@ class ChangedFile:
     patch: str = ""
     content: str = ""
     classification: FileClassification = FileClassification.OTHER
+    file_type: str = "other"  # Configurable type string from file_types.yaml
     added_lines: list[tuple[int, str]] = field(default_factory=list)
 
 

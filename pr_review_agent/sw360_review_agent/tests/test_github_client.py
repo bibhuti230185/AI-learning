@@ -15,37 +15,59 @@ from sw360_review_agent.schemas import FileClassification
 
 class TestClassifyFile:
     def test_controller(self):
-        assert classify_file("rest/server/ProjectController.java") == FileClassification.CONTROLLER
+        classification, file_type = classify_file("rest/server/ProjectController.java")
+        assert classification == FileClassification.CONTROLLER
+        assert file_type == "controller"
 
     def test_service(self):
-        assert classify_file("rest/Sw360ProjectService.java") == FileClassification.SERVICE
+        classification, file_type = classify_file("rest/Sw360ProjectService.java")
+        assert classification == FileClassification.SERVICE
+        assert file_type == "service"
 
     def test_test_file(self):
-        assert classify_file("test/ProjectTest.java") == FileClassification.TEST
+        classification, file_type = classify_file("test/ProjectTest.java")
+        assert classification == FileClassification.TEST
+        assert file_type == "test"
 
     def test_spec_test(self):
-        assert classify_file("test/ProjectSpecTest.java") == FileClassification.TEST
+        classification, file_type = classify_file("test/ProjectSpecTest.java")
+        assert classification == FileClassification.TEST
+        assert file_type == "test"
 
     def test_thrift(self):
-        assert classify_file("libraries/components.thrift") == FileClassification.THRIFT
+        classification, file_type = classify_file("libraries/components.thrift")
+        assert classification == FileClassification.THRIFT
+        assert file_type == "thrift"
 
     def test_handler(self):
-        assert classify_file("backend/ComponentHandler.java") == FileClassification.HANDLER
+        classification, file_type = classify_file("backend/ComponentHandler.java")
+        assert classification == FileClassification.HANDLER
+        assert file_type == "handler"
 
     def test_database_handler(self):
-        assert classify_file("backend/ComponentDatabaseHandler.java") == FileClassification.HANDLER
+        classification, file_type = classify_file("backend/ComponentDatabaseHandler.java")
+        assert classification == FileClassification.HANDLER
+        assert file_type == "handler"
 
     def test_jackson(self):
-        assert classify_file("rest/JacksonCustomizations.java") == FileClassification.JACKSON_MIXIN
+        classification, file_type = classify_file("rest/JacksonCustomizations.java")
+        assert classification == FileClassification.JACKSON_MIXIN
+        assert file_type == "jackson_mixin"
 
     def test_generic_java(self):
-        assert classify_file("src/SomeUtil.java") == FileClassification.JAVA
+        classification, file_type = classify_file("src/SomeUtil.java")
+        assert classification == FileClassification.JAVA
+        assert file_type == "java"
 
     def test_non_java(self):
-        assert classify_file("README.md") == FileClassification.OTHER
+        classification, file_type = classify_file("README.md")
+        assert classification == FileClassification.OTHER
+        assert file_type == "other"
 
     def test_yaml(self):
-        assert classify_file("config/application.yml") == FileClassification.OTHER
+        classification, file_type = classify_file("config/application.yml")
+        assert classification == FileClassification.OTHER
+        assert file_type == "other"
 
 
 class TestExtractAddedLines:

@@ -1,0 +1,127 @@
+# Lint Rules (Layer 1 — Deterministic)
+# ======================================
+# Fast, regex-based rules that run before the LLM.
+# These catch issues instantly with zero API cost.
+#
+# Rule types:
+#   commit  — checks commit messages (pattern must/must-not appear)
+#   file    — checks added lines in changed files (regex patterns)
+#
+# Fields:
+#   id:            Unique rule identifier (used in config.yaml to enable/disable)
+#   name:          Human-readable name
+#   type:          "commit" or "file"
+#   severity:      "error", "warning", or "suggestion"
+#   patterns:      List of regex patterns to detect violations
+#   match_type:    "must_contain" (violation if missing) or "must_not_match" (violation if found)
+#   exclude_paths: File paths containing these strings are skipped
+#   applies_to:    List of file types this rule applies to (from file_types.yaml). Omit for all.
+#   message:       Message shown to the developer. Use {label} for pattern-specific labels.
+#   suggestion:    Suggested fix.
+
+rules:
+  # ─── Commit-level rules ───────────────────────────────────────────────────
+
+  - id: R01
+    name: "Signed-off-by (DCO)"
+    type: commit
+    severity: error
+    match_type: must_contain
+    pattern: "Signed-off-by:"
+    message: "Commit missing 'Signed-off-by:' line (DCO requirement)."
+    suggestion: "Use `git commit -s` to add Signed-off-by automatically."
+
+  # ─── File-level rules ─────────────────────────────────────────────────────
+
+  - id: R02
+    name: "Thrift null-safety"
+    type: file
+    severity: warning
+    patterns:
+      - regex: '(client|Client)\.\w+\([^)]*\)\.\w+\('
+        label: "chained call"
+    applies_to: [service, handler, java]
+    message: "Thrift call result used directly without null-check. Thrift methods can return null."
+    suggestion: |
+      Assign to a variable first and check for null:
+      Component comp = client.getComponentById(id, user);
+      if (comp == null) { throw new ResourceNotFoundException(...); }
+
+  - id: R03
+    name: "Hardcoded credentials"
+    type: file
+    severity: error
+    patterns:
+      - regex: '(?i)(password|passwd|pwd)\s*=\s*"[^"]{4,}"'
+        label: "password"
+      - regex: '(?i)(api[_-]?key|apikey|secret[_-]?key)\s*=\s*"[^"]{4,}"'
+        label: "API key"
+      - regex: '(?i)(token)\s*=\s*"[^"]{8,}"'
+        label: "token"
+      - regex: '(?i)Bearer\s+[A-Za-z0-9\-._~+/]+=*'
+        label: "bearer token"
+    exclude_paths: ["/test/", "example"]
+    message: "Potential hardcoded {label} detected. Use configuration or environment variables."
+    suggestion: "Move secrets to properties files or environment variables."
+
+  - id: R04
+    name: "Unbounded collection fetch"
+    type: file
+    severity: warning
+    patterns:
+      - regex: '\b(getAll|findAll|listAll|fetchAll)\w*\s*\('
+        label: "fetch-all call"
+    exclude_patterns: ['(PaginationData|Pageable|pageData|pageable|limit|offset)']
+    applies_to: [service, handler, java]
+    message: "Unbounded collection fetch without pagination. Large datasets may cause OOM."
+    suggestion: "Use paginated query methods with PaginationData/Pageable."
+
+  - id: R05
+    name: "Missing migration script"
+    type: file
+    severity: warning
+    patterns:
+      - regex: '^\d+:\s+(optional|required)?\s*\w+\s+\w+'
+        label: "new field"
+    applies_to: [thrift]
+    only_modified: true
+    message: "New Thrift field(s) added. Ensure a migration script exists for existing documents."
+    suggestion: "Create scripts/migrations/0XX_migrate_<description>.py for backward compatibility."
+
+  - id: R06
+    name: "Generic exception catch"
+    type: file
+    severity: warning
+    patterns:
+      - regex: 'catch\s*\(\s*Exception\s+\w+\s*\)'
+        label: "catch(Exception)"
+    exclude_paths: ["/test/"]
+    applies_to: [controller, service, handler, java]
+    message: "Catching generic Exception. Use specific exception types."
+    suggestion: "Use specific types like SW360Exception, TException, or IOException."
+
+# ─── Adding your own rules ──────────────────────────────────────────────────
+# Copy a rule above and modify it. Examples:
+#
+# Python — missing type hints:
+#   - id: R10
+#     name: "Missing type hints"
+#     type: file
+#     severity: suggestion
+#     patterns:
+#       - regex: 'def \w+\([^)]*\)\s*:'
+#     exclude_patterns: ['def \w+\([^)]*\)\s*->']
+#     applies_to: [python]
+#     message: "Function missing return type annotation."
+#     suggestion: "Add return type: def func(...) -> ReturnType:"
+#
+# TypeScript — console.log left in:
+#   - id: R11
+#     name: "Console log in production"
+#     type: file
+#     severity: warning
+#     patterns:
+#       - regex: 'console\.(log|debug|info)\('
+#     exclude_paths: [".spec.", ".test."]
+#     message: "console.log found in production code."
+#     suggestion: "Remove or replace with proper logging framework."

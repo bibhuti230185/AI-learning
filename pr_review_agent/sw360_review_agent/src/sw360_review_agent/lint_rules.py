@@ -7,19 +7,13 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 
-"""Layer 1 — Deterministic lint rules for SW360 PRs.
+"""Layer 1 — Deterministic lint rules for PR review.
 
 These rules run instantly (< 10 seconds), cost $0, and are 100% accurate.
-They catch violations that ArchUnit (78 tests) and CI workflows do NOT cover.
+They catch violations that CI workflows do NOT cover.
 
-What ArchUnit/CI already enforces (we intentionally skip these):
-  - License headers (CI: testForLicenseHeaders.sh)
-  - System.out / printStackTrace / LoggerFactory (ArchUnit: LoggingStandardRulesTest)
-  - Field @Autowired (ArchUnit: DependencyInjectionRulesTest)
-  - @PreAuthorize / @Secured (ArchUnit: SecurityAnnotationRulesTest)
-  - @Operation on endpoints (ArchUnit: OpenApiDocumentationRulesTest)
-  - Naming conventions (ArchUnit: NamingConventionRulesTest)
-  - Commit message format (CI: conventional commits action)
+Rules are loaded from project_rules/lint_rules.yaml for full configurability.
+Any project can define its own rules without modifying Python code.
 """
 
 from __future__ import annotations
@@ -29,6 +23,7 @@ from typing import Callable
 
 import structlog
 
+from sw360_review_agent.rules_loader import LintRule, ProjectRules
 from sw360_review_agent.schemas import (
     ChangedFile,
     FileClassification,
@@ -250,7 +245,7 @@ def check_catch_generic_exception(file: ChangedFile) -> list[ReviewComment]:
 
 
 # ---------------------------------------------------------------------------
-# Rule Registry
+# Rule Registry (legacy — kept for backward compatibility with tests)
 # ---------------------------------------------------------------------------
 
 # Maps rule ID -> (checker function, applicable file classifications)
@@ -263,84 +258,192 @@ _FILE_RULES: dict[str, tuple[RuleChecker, set[FileClassification] | None]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Config-driven rule engine
+# ---------------------------------------------------------------------------
+
+
+def _run_config_rule_on_file(rule: LintRule, file: ChangedFile) -> list[ReviewComment]:
+    """Execute a YAML-defined lint rule against a changed file."""
+    findings: list[ReviewComment] = []
+
+    # Check applicability
+    if rule.applies_to is not None:
+        if file.file_type not in rule.applies_to:
+            return []
+
+    # Check only_modified constraint
+    if rule.only_modified and file.status != "modified":
+        return []
+
+    for line_num, line_content in file.added_lines:
+        # Check exclude_paths
+        if any(ep in file.path for ep in rule.exclude_paths):
+            continue
+
+        for pattern in rule.patterns:
+            if pattern.regex.search(line_content):
+                # Check exclude_patterns (line must NOT match any)
+                excluded = any(
+                    ep.search(line_content) for ep in rule.exclude_patterns
+                )
+                if excluded:
+                    continue
+
+                message = rule.message.replace("{label}", pattern.label)
+                findings.append(
+                    ReviewComment(
+                        file=file.path,
+                        line=line_num,
+                        severity=Severity(rule.severity),
+                        rule=f"SW360-{rule.id}" if not rule.id.startswith("SW360-") else rule.id,
+                        message=message,
+                        suggestion=rule.suggestion,
+                        source="deterministic",
+                    )
+                )
+                break  # One finding per line per rule
+
+    return findings
+
+
+def _run_config_rule_on_commits(rule: LintRule, commit_messages: list[str]) -> list[ReviewComment]:
+    """Execute a YAML-defined commit rule against commit messages."""
+    findings: list[ReviewComment] = []
+
+    for i, msg in enumerate(commit_messages):
+        if rule.match_type == "must_contain":
+            if rule.pattern not in msg:
+                findings.append(
+                    ReviewComment(
+                        file="",
+                        line=0,
+                        severity=Severity(rule.severity),
+                        rule=f"SW360-{rule.id}" if not rule.id.startswith("SW360-") else rule.id,
+                        message=f"Commit {i + 1}: {rule.message}",
+                        suggestion=rule.suggestion,
+                        source="deterministic",
+                    )
+                )
+        elif rule.match_type == "must_not_match":
+            for pattern in rule.patterns:
+                if pattern.regex.search(msg):
+                    message = rule.message.replace("{label}", pattern.label)
+                    findings.append(
+                        ReviewComment(
+                            file="",
+                            line=0,
+                            severity=Severity(rule.severity),
+                            rule=f"SW360-{rule.id}" if not rule.id.startswith("SW360-") else rule.id,
+                            message=f"Commit {i + 1}: {message}",
+                            suggestion=rule.suggestion,
+                            source="deterministic",
+                        )
+                    )
+                    break
+
+    return findings
+
+
 class DeterministicLinter:
     """Layer 1 deterministic linter that runs rule checks on changed files.
 
-    Focuses on violations that ArchUnit and CI pipelines do NOT catch.
+    Supports two modes:
+    1. Config-driven: loads rules from ProjectRules (YAML-defined)
+    2. Legacy: uses hardcoded Python functions (backward compatible)
+
+    The config-driven mode is preferred for new projects.
     """
 
-    def __init__(self, enabled_rules: list[str] | None = None) -> None:
-        """Initialize with optional subset of rules to enable.
+    def __init__(
+        self,
+        enabled_rules: list[str] | None = None,
+        project_rules: ProjectRules | None = None,
+    ) -> None:
+        """Initialize the linter.
 
         Args:
-            enabled_rules: List of rule IDs (e.g., ["R01", "R02"]).
-                          If None, all rules are enabled.
+            enabled_rules: List of rule IDs to enable. If None, all rules are enabled.
+            project_rules: Loaded project rules. If provided, uses config-driven mode.
         """
+        self._project_rules = project_rules
+        self._config_rules = project_rules.lint_rules if project_rules else []
+
         if enabled_rules is None:
-            self._enabled = set(_FILE_RULES.keys()) | {"R01"}
+            if self._config_rules:
+                self._enabled = {r.id for r in self._config_rules}
+            else:
+                self._enabled = set(_FILE_RULES.keys()) | {"R01"}
         else:
             self._enabled = set(enabled_rules)
 
     def check_file(self, file: ChangedFile) -> list[ReviewComment]:
-        """Run all applicable deterministic rules on a single file.
-
-        Args:
-            file: The changed file to check.
-
-        Returns:
-            List of review comments (findings).
-        """
-        if file.classification == FileClassification.OTHER:
+        """Run all applicable rules on a single file."""
+        if file.classification == FileClassification.OTHER and file.file_type == "other":
             return []
 
         findings: list[ReviewComment] = []
 
-        for rule_id, (checker, applicable_to) in _FILE_RULES.items():
-            if rule_id not in self._enabled:
-                continue
-
-            # Check if rule applies to this file classification
-            if applicable_to is not None and file.classification not in applicable_to:
-                continue
-
-            try:
-                rule_findings = checker(file)
-                findings.extend(rule_findings)
-            except Exception as exc:
-                logger.warning(
-                    "rule_check_failed",
-                    rule=rule_id,
-                    file=file.path,
-                    error=str(exc),
-                )
+        if self._config_rules:
+            # Config-driven mode: run YAML-defined rules
+            for rule in self._config_rules:
+                if rule.id not in self._enabled:
+                    continue
+                if rule.type != "file":
+                    continue
+                try:
+                    rule_findings = _run_config_rule_on_file(rule, file)
+                    findings.extend(rule_findings)
+                except Exception as exc:
+                    logger.warning(
+                        "config_rule_check_failed",
+                        rule=rule.id,
+                        file=file.path,
+                        error=str(exc),
+                    )
+        else:
+            # Legacy mode: run hardcoded Python functions
+            for rule_id, (checker, applicable_to) in _FILE_RULES.items():
+                if rule_id not in self._enabled:
+                    continue
+                if applicable_to is not None and file.classification not in applicable_to:
+                    continue
+                try:
+                    rule_findings = checker(file)
+                    findings.extend(rule_findings)
+                except Exception as exc:
+                    logger.warning(
+                        "rule_check_failed",
+                        rule=rule_id,
+                        file=file.path,
+                        error=str(exc),
+                    )
 
         return findings
 
     def check_commits(self, commit_messages: list[str]) -> list[ReviewComment]:
-        """Run commit-level rules (R01: signed-off-by).
+        """Run commit-level rules."""
+        findings: list[ReviewComment] = []
 
-        Args:
-            commit_messages: List of commit messages in the PR.
+        if self._config_rules:
+            # Config-driven mode
+            for rule in self._config_rules:
+                if rule.id not in self._enabled:
+                    continue
+                if rule.type != "commit":
+                    continue
+                findings.extend(_run_config_rule_on_commits(rule, commit_messages))
+        else:
+            # Legacy mode
+            if "R01" in self._enabled:
+                findings.extend(check_signed_off(commit_messages))
 
-        Returns:
-            List of review comments for commit-level violations.
-        """
-        if "R01" not in self._enabled:
-            return []
-        return check_signed_off(commit_messages)
+        return findings
 
     def check_all(
         self, files: list[ChangedFile], commit_messages: list[str] | None = None
     ) -> list[ReviewComment]:
-        """Run all rules on all files and commits.
-
-        Args:
-            files: List of changed files.
-            commit_messages: Optional list of commit messages.
-
-        Returns:
-            Combined list of all findings.
-        """
+        """Run all rules on all files and commits."""
         findings: list[ReviewComment] = []
 
         for file in files:

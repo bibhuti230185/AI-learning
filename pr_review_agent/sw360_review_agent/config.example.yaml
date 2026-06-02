@@ -1,6 +1,18 @@
 # Configuration
 # Copy this file to config.yaml and fill in your values
 
+# ─── Project Rules Directory ────────────────────────────────────────────────
+# Path to the project_rules/ directory containing:
+#   file_types.yaml    — How to classify changed files
+#   lint_rules.yaml    — Layer 1 regex-based lint rules
+#   review_prompt.md   — LLM system prompt
+#   review_focus.yaml  — File-type-specific LLM instructions + rules
+#   indexing.yaml      — What to index for RAG
+#
+# Defaults to project_rules/ in the current directory.
+# Override this to point to a different project's rules.
+project_rules_dir: "./project_rules"
+
 # Model provider configuration
 # Supported: "anthropic", "openai", "custom"
 # "custom" allows plugging in any model via HTTP endpoint (e.g., Siemens-trained models)
@@ -21,9 +33,10 @@ github:
   # Repository to review (owner/repo format)
   repository: "eclipse-sw360/sw360"
 
-# Layer 1: Deterministic rules (complements ArchUnit — no overlap)
+# Layer 1: Deterministic rules (loaded from project_rules/lint_rules.yaml)
 layer1:
   enabled: true
+  # Which rule IDs to enable (must exist in lint_rules.yaml)
   rules:
     - R01  # Commits have Signed-off-by (DCO)
     - R02  # Thrift return values null-checked
@@ -32,21 +45,22 @@ layer1:
     - R05  # New Thrift fields need migration script
     - R06  # No catch(Exception) — use specific types
 
-# Layer 2: RAG + LLM review (expert-level contextual checks)
+# Layer 2: RAG + LLM review (rules loaded from project_rules/review_focus.yaml)
 layer2:
   enabled: true
+  # Which LLM rule IDs to enable (must exist in review_focus.yaml)
   checks:
     - L01  # API backward compatibility
-    - L02  # JacksonCustomizations dual registration
-    - L03  # HATEOAS & HAL response format
-    - L04  # Thrift null-safety
+    - L02  # Serialization consistency
+    - L03  # Response format compliance
+    - L04  # External call null-safety
     - L05  # Exception handling chain
     - L06  # Cross-file consistency
-    - L07  # CouchDB query efficiency (N+1)
+    - L07  # Query efficiency
     - L08  # Pagination correctness
-    - L09  # CouchDB view design
-    - L10  # Test quality & coverage depth
-    - L11  # Document-level permission checks
+    - L09  # Data layer design
+    - L10  # Test quality
+    - L11  # Permission checks
     - L12  # Resource management
   vector_store:
     provider: "chromadb"
